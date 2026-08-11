@@ -60,7 +60,7 @@ export default function Booking() {
     event.preventDefault()
     setStatusNote('')
 
-    await trackEvent(Events.BOOKING_FORM_SUBMITTED, {
+    trackEvent(Events.BOOKING_FORM_SUBMITTED, {
       page: '/#booking',
       accommodation: form.accommodation,
       data: {
@@ -102,52 +102,50 @@ export default function Booking() {
     setSubmitting(true)
     setError('')
 
-    try {
-      await trackEvent(Events.BOOKING_ENQUIRY_STARTED, {
-        accommodation: form.accommodation,
-        data: { guests: form.guests, checkIn: form.checkIn, checkOut: form.checkOut },
-      })
-
-      const result = await notifyHostFromBookingEnquiry({
-        name,
-        phone,
-        email,
-        accommodation: form.accommodation,
-        guests: form.guests,
-        checkIn: form.checkIn,
-        checkOut: form.checkOut,
-        message: form.message.trim(),
-        sourceEvent: Events.BOOKING_ENQUIRY_COMPLETED,
-      })
-
-      await trackEvent(Events.BOOKING_ENQUIRY_COMPLETED, {
-        accommodation: form.accommodation,
-        data: {
-          leadId: result.lead?.id,
-          guests: form.guests,
-          checkIn: form.checkIn,
-          checkOut: form.checkOut,
-        },
-      })
-
-      openWhatsAppBooking({
-        name,
-        phone,
-        guests: form.guests,
-        accommodation: form.accommodation,
-        checkIn: form.checkIn,
-        checkOut: form.checkOut,
-        message: form.message.trim(),
-      })
-
-      setStatusNote(
-        'Enquiry sent to the host. WhatsApp is opening so you can continue the conversation. Booking is confirmed only after the host replies.',
-      )
-    } catch (err) {
-      setError(err.message || 'Could not send enquiry. Please try again.')
-    } finally {
-      setSubmitting(false)
+    const bookingPayload = {
+      name,
+      phone,
+      guests: form.guests,
+      accommodation: form.accommodation,
+      checkIn: form.checkIn,
+      checkOut: form.checkOut,
+      message: form.message.trim(),
     }
+
+    // Open WhatsApp immediately — don't make the guest wait on backend notifications.
+    openWhatsAppBooking(bookingPayload)
+    setStatusNote(
+      'WhatsApp is opening with your enquiry. We are also notifying the host in the background. Booking is confirmed only after the host replies.',
+    )
+    setSubmitting(false)
+
+    trackEvent(Events.BOOKING_ENQUIRY_STARTED, {
+      accommodation: form.accommodation,
+      data: { guests: form.guests, checkIn: form.checkIn, checkOut: form.checkOut },
+    })
+
+    notifyHostFromBookingEnquiry({
+      ...bookingPayload,
+      email,
+      sourceEvent: Events.BOOKING_ENQUIRY_COMPLETED,
+    })
+      .then((result) => {
+        trackEvent(Events.BOOKING_ENQUIRY_COMPLETED, {
+          accommodation: form.accommodation,
+          data: {
+            leadId: result.lead?.id,
+            guests: form.guests,
+            checkIn: form.checkIn,
+            checkOut: form.checkOut,
+          },
+        })
+      })
+      .catch((err) => {
+        console.warn('[booking] background notify failed', err.message)
+        setStatusNote(
+          'WhatsApp opened with your enquiry. Host notification is still syncing — if needed, send the WhatsApp message to complete your request.',
+        )
+      })
   }
 
   return (

@@ -23,10 +23,10 @@ export default function Header() {
 
   const close = () => setOpen(false)
 
-  const onBookNow = async (event) => {
+  const onBookNow = (event) => {
     event.preventDefault()
     close()
-    await requestBookNow({ source: 'header' })
+    requestBookNow({ source: 'header' })
   }
 
   return (

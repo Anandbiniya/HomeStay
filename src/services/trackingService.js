@@ -2,35 +2,43 @@ import { getVisitorId } from './visitorService'
 
 const API_BASE = import.meta.env.VITE_API_BASE || '/api'
 
-export async function trackEvent(event, details = {}) {
+/**
+ * Track an analytics event without blocking the UI.
+ * Returns a promise, but callers should generally not await it for CTAs.
+ */
+export function trackEvent(event, details = {}) {
   const visitorId = getVisitorId()
-  if (!visitorId || !event) return null
+  if (!visitorId || !event) return Promise.resolve(null)
 
   const payload = {
     visitorId,
     event,
-    page: details.page || (typeof window !== 'undefined' ? window.location.pathname + window.location.hash : '/'),
+    page:
+      details.page ||
+      (typeof window !== 'undefined' ? window.location.pathname + window.location.hash : '/'),
     accommodation: details.accommodation || null,
     timestamp: new Date().toISOString(),
     data: details.data || {},
   }
 
-  try {
-    const response = await fetch(`${API_BASE}/events`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+  return fetch(`${API_BASE}/events`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    keepalive: true,
+  })
+    .then(async (response) => {
+      if (!response.ok) {
+        console.warn('[tracking] failed', response.status)
+        return null
+      }
+      const data = await response.json()
+      return data.event
     })
-    if (!response.ok) {
-      console.warn('[tracking] failed', response.status)
+    .catch((error) => {
+      console.warn('[tracking] unavailable', error.message)
       return null
-    }
-    const data = await response.json()
-    return data.event
-  } catch (error) {
-    console.warn('[tracking] unavailable', error.message)
-    return null
-  }
+    })
 }
 
 export const Events = {

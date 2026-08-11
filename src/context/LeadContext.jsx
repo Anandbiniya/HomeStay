@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import LeadCaptureModal from '../components/LeadCaptureModal'
 import { Events, trackEvent } from '../services/trackingService'
 import { notifyHostFromLeadCapture } from '../services/notificationService'
-import { getStoredLeadContact, getVisitorId, hasLeadContact } from '../services/visitorService'
+import { getStoredLeadContact, getVisitorId, hasLeadContact, storeLeadContact } from '../services/visitorService'
 import { getWhatsAppUrl } from '../utils/whatsapp'
 
 const LeadContext = createContext(null)
@@ -59,7 +59,21 @@ export function LeadProvider({ children }) {
 
   const handleLeadSubmit = useCallback(
     async ({ name, phone, email }) => {
-      const result = await notifyHostFromLeadCapture({
+      const nextContact = {
+        name: name || '',
+        phone: phone || '',
+        email: email || '',
+        leadId: null,
+        capturedAt: new Date().toISOString(),
+      }
+
+      // Instant local save + close so Book Now continues without waiting on the network.
+      storeLeadContact(nextContact)
+      setContact(nextContact)
+      closeModal(nextContact)
+
+      // Host notification + tracking happen in the background.
+      notifyHostFromLeadCapture({
         name,
         phone,
         email,
@@ -67,21 +81,26 @@ export function LeadProvider({ children }) {
         sourceEvent: modalMeta.sourceEvent || Events.LEAD_CAPTURED,
         intent: modalMeta.intent || 'CONTACT',
       })
+        .then((result) => {
+          if (!result?.lead) return
+          const synced = {
+            name: result.lead.name,
+            phone: result.lead.phone,
+            email: result.lead.email || '',
+            leadId: result.lead.id,
+            capturedAt: result.lead.updatedAt,
+          }
+          storeLeadContact(synced)
+          setContact(synced)
+          trackEvent(Events.LEAD_CAPTURED, {
+            accommodation: modalMeta.accommodation,
+            data: { leadId: result.lead.id },
+          })
+        })
+        .catch((error) => {
+          console.warn('[lead] background notify failed', error.message)
+        })
 
-      await trackEvent(Events.LEAD_CAPTURED, {
-        accommodation: modalMeta.accommodation,
-        data: { leadId: result.lead?.id },
-      })
-
-      const nextContact = {
-        name: result.lead.name,
-        phone: result.lead.phone,
-        email: result.lead.email || '',
-        leadId: result.lead.id,
-        capturedAt: result.lead.updatedAt,
-      }
-      setContact(nextContact)
-      closeModal(nextContact)
       return nextContact
     },
     [closeModal, modalMeta],
@@ -98,80 +117,104 @@ export function LeadProvider({ children }) {
       page: '/#booking',
       accommodation: prefill.accommodation || null,
     })
-    const target = document.getElementById('booking')
-    if (target) {
+
+    const scrollToBooking = () => {
+      const target = document.getElementById('booking')
+      if (!target) return
+      const headerOffset = 88
+      const top = target.getBoundingClientRect().top + window.scrollY - headerOffset
       window.location.hash = 'booking'
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      window.scrollTo({ top: Math.max(0, top), behavior: 'auto' })
     }
+
+    // Wait one frame so the lead modal can unmount and unlock body scroll.
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(scrollToBooking)
+    })
   }, [])
 
   const requestBookNow = useCallback(
-    async ({ accommodation, source = 'book_now' } = {}) => {
-      await trackEvent(Events.BOOK_NOW_CLICKED, {
+    ({ accommodation, source = 'book_now' } = {}) => {
+      // Never block the button on analytics.
+      trackEvent(Events.BOOK_NOW_CLICKED, {
         page: '/#booking',
         accommodation: accommodation || null,
         data: { source },
       })
-      await trackEvent(Events.BOOKING_ENQUIRY_STARTED, {
+      trackEvent(Events.BOOKING_ENQUIRY_STARTED, {
         accommodation: accommodation || null,
       })
 
-      const lead = await ensureContact({
+      const existing = getStoredLeadContact()
+      if (existing?.phone) {
+        setContact(existing)
+        openBooking({ accommodation: accommodation || '' })
+        return Promise.resolve(existing)
+      }
+
+      return ensureContact({
         sourceEvent: Events.BOOK_NOW_CLICKED,
         accommodation,
         intent: 'BOOKING_ENQUIRY',
         title: 'Before we connect you with the host',
+      }).then((lead) => {
+        if (!lead) return null
+        openBooking({ accommodation: accommodation || '' })
+        return lead
       })
-
-      if (!lead) return null
-      openBooking({ accommodation: accommodation || '' })
-      return lead
     },
     [ensureContact, openBooking],
   )
 
   const requestWhatsAppContact = useCallback(
-    async ({ accommodation, message, source = 'whatsapp' } = {}) => {
-      await trackEvent(Events.WHATSAPP_CLICKED, {
+    ({ accommodation, message, source = 'whatsapp' } = {}) => {
+      trackEvent(Events.WHATSAPP_CLICKED, {
         accommodation: accommodation || null,
         data: { source },
       })
 
-      const lead = await ensureContact({
+      const openChat = (lead) => {
+        if (!lead) return null
+        const text = [
+          'Hello Hostillam,',
+          '',
+          message || 'I would like to enquire about a booking.',
+          '',
+          `Name: ${lead.name || '—'}`,
+          `Phone: ${lead.phone}`,
+          lead.email ? `Email: ${lead.email}` : null,
+          accommodation ? `Accommodation: ${accommodation}` : null,
+          '',
+          'Please let me know about availability.',
+          '',
+          'Thank you.',
+        ]
+          .filter(Boolean)
+          .join('\n')
+
+        window.open(getWhatsAppUrl(text), '_blank', 'noopener,noreferrer')
+        return lead
+      }
+
+      const existing = getStoredLeadContact()
+      if (existing?.phone) {
+        setContact(existing)
+        return Promise.resolve(openChat(existing))
+      }
+
+      return ensureContact({
         sourceEvent: Events.WHATSAPP_CLICKED,
         accommodation,
         intent: 'WHATSAPP_CONTACT',
         title: 'Before we connect you with the host',
-      })
-
-      if (!lead) return null
-
-      const text = [
-        'Hello Hostillam,',
-        '',
-        message || 'I would like to enquire about a booking.',
-        '',
-        `Name: ${lead.name || '—'}`,
-        `Phone: ${lead.phone}`,
-        lead.email ? `Email: ${lead.email}` : null,
-        accommodation ? `Accommodation: ${accommodation}` : null,
-        '',
-        'Please let me know about availability.',
-        '',
-        'Thank you.',
-      ]
-        .filter(Boolean)
-        .join('\n')
-
-      window.open(getWhatsAppUrl(text), '_blank', 'noopener,noreferrer')
-      return lead
+      }).then(openChat)
     },
     [ensureContact],
   )
 
   const requestContactHost = useCallback(
-    async ({ accommodation } = {}) => {
-      await trackEvent(Events.CONTACT_CLICKED, {
+    ({ accommodation } = {}) => {
+      trackEvent(Events.CONTACT_CLICKED, {
         accommodation: accommodation || null,
       })
       return requestWhatsAppContact({

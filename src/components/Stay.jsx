@@ -8,13 +8,13 @@ export default function Stay() {
   const ref = useReveal()
   const { requestBookNow, trackEvent } = useLead()
 
-  const onBook = async (item) => {
-    await trackEvent(Events.ACCOMMODATION_DETAIL_OPENED, {
+  const onBook = (item) => {
+    trackEvent(Events.ACCOMMODATION_DETAIL_OPENED, {
       page: '/#stay',
       accommodation: item.name,
       data: { id: item.id },
     })
-    await requestBookNow({ accommodation: item.name, source: 'stay_card' })
+    requestBookNow({ accommodation: item.name, source: 'stay_card' })
   }
 
   return (

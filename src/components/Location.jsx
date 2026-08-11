@@ -9,23 +9,23 @@ export default function Location() {
   const { location, phone, email, social, whatsapp } = siteConfig
   const { requestWhatsAppContact, requestContactHost, trackEvent } = useLead()
 
-  const onMaps = async () => {
-    await trackEvent(Events.LOCATION_CLICKED, {
+  const onMaps = () => {
+    trackEvent(Events.LOCATION_CLICKED, {
       page: '/#location',
       data: { target: 'maps' },
     })
   }
 
-  const onWhatsApp = async (event) => {
+  const onWhatsApp = (event) => {
     event.preventDefault()
-    await requestWhatsAppContact({
+    requestWhatsAppContact({
       source: 'location',
       message: 'I would like to enquire about a booking.',
     })
   }
 
-  const onPhone = async () => {
-    await trackEvent(Events.CONTACT_CLICKED, {
+  const onPhone = () => {
+    trackEvent(Events.CONTACT_CLICKED, {
       page: '/#location',
       data: { channel: 'phone' },
     })
