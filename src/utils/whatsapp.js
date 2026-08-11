@@ -59,3 +59,33 @@ export function openWhatsAppQuick(accommodationName) {
   ].join('\n')
   window.open(getWhatsAppUrl(text), '_blank', 'noopener,noreferrer')
 }
+
+/**
+ * Build a simple volunteer application WhatsApp message.
+ */
+export function buildVolunteerMessage({ name, phone, email, helpWith, preferredDates }) {
+  return [
+    '🌿 HOSTILLAM VOLUNTEER APPLICATION',
+    '',
+    `Name: ${name}`,
+    '',
+    `Phone: ${phone}`,
+    '',
+    `Email: ${email || '—'}`,
+    '',
+    'I can help with:',
+    helpWith,
+    '',
+    "I'd like to come:",
+    preferredDates,
+    '',
+    "I'm interested in volunteering with Hostillam and would like to know more about the opportunity.",
+  ].join('\n')
+}
+
+export function openWhatsAppVolunteer(formData) {
+  const text = buildVolunteerMessage(formData)
+  const url = getWhatsAppUrl(text)
+  window.open(url, '_blank', 'noopener,noreferrer')
+  return url
+}

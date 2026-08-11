@@ -36,7 +36,7 @@ export default function Hero() {
             >
               Book via WhatsApp
             </button>
-            <a href="#stay" className="btn btn-secondary">
+            <a href="/#stay" className="btn btn-secondary">
               Explore Stay
             </a>
           </div>

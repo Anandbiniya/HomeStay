@@ -9,7 +9,7 @@ export default function Footer() {
     <footer className="border-t border-pine/10 bg-pine-deep text-white">
       <div className="container-site grid gap-10 py-14 md:grid-cols-[1.2fr_1fr_1fr]">
         <div>
-          <a href="#home" className="font-display text-3xl font-semibold tracking-[-0.02em]">
+          <a href="/" className="font-display text-3xl font-semibold tracking-[-0.02em]">
             {siteConfig.name}
           </a>
           <p className="mt-3 max-w-sm text-sm leading-relaxed text-white/70">{siteConfig.tagline}</p>

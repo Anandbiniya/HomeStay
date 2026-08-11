@@ -39,7 +39,7 @@ export default function Header() {
     >
       <div className="container-site flex h-[4.25rem] items-center justify-between gap-4 md:h-[4.75rem]">
         <a
-          href="#home"
+          href="/"
           className={`font-display text-[1.45rem] font-semibold tracking-[-0.02em] transition-colors ${
             scrolled || open ? 'text-pine-deep' : 'text-white'
           }`}

@@ -10,7 +10,11 @@ const LeadContext = createContext(null)
 function scrollToBookingSection() {
   document.body.style.overflow = ''
   const target = document.getElementById('booking')
-  if (!target) return false
+  if (!target) {
+    // Book Now from other pages (e.g. Volunteer) should land on the home booking section.
+    window.location.assign('/#booking')
+    return false
+  }
 
   // Make sure reveal animation is not leaving the section visually unset.
   target.querySelectorAll('.reveal').forEach((node) => node.classList.add('is-visible'))

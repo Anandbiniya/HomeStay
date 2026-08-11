@@ -39,14 +39,15 @@ export const siteConfig = {
   },
 
   nav: [
-    { label: 'About', href: '#about' },
-    { label: 'Stay', href: '#stay' },
-    { label: 'Experience', href: '#experience' },
-    { label: 'Gallery', href: '#gallery' },
-    { label: 'Reels', href: '#reels' },
-    { label: 'Reviews', href: '#reviews' },
-    { label: 'Book', href: '#booking' },
-    { label: 'Location', href: '#location' },
+    { label: 'About', href: '/#about' },
+    { label: 'Stay', href: '/#stay' },
+    { label: 'Experience', href: '/#experience' },
+    { label: 'Gallery', href: '/#gallery' },
+    { label: 'Reels', href: '/#reels' },
+    { label: 'Reviews', href: '/#reviews' },
+    { label: 'Volunteer', href: '/volunteer' },
+    { label: 'Book', href: '/#booking' },
+    { label: 'Location', href: '/#location' },
   ],
 }
 
