@@ -29,7 +29,7 @@ export default function Stay() {
                   alt={item.name}
                   className="aspect-[4/3] w-full object-cover transition duration-700 group-hover:scale-[1.04]"
                 />
-                <span className="absolute left-4 top-4 rounded-full bg-white/92 px-3 py-1 text-xs font-bold uppercase tracking-[0.08em] text-pine">
+                <span className="absolute left-4 top-4 rounded-lg bg-white/92 px-3 py-1 text-xs font-bold uppercase tracking-[0.08em] text-pine">
                   {item.type}
                 </span>
               </div>

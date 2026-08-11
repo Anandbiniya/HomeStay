@@ -18,7 +18,7 @@
   --color-cream-leaf: #e7ebe4;
 
   --radius-card: 1.25rem;
-  --radius-btn: 9999px;
+  --radius-btn: 0.9rem;
   --shadow-soft: 0 18px 50px -28px rgb(21 32 28 / 0.35);
   --shadow-card: 0 12px 40px -24px rgb(21 32 28 / 0.28);
 }

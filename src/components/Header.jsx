@@ -68,7 +68,7 @@ export default function Header() {
 
         <button
           type="button"
-          className={`inline-flex h-11 w-11 items-center justify-center rounded-full border lg:hidden ${
+          className={`inline-flex h-11 w-11 items-center justify-center rounded-xl border lg:hidden ${
             scrolled || open
               ? 'border-pine/15 bg-white text-pine'
               : 'border-white/35 bg-white/10 text-white'
