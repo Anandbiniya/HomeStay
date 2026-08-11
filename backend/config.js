@@ -16,6 +16,7 @@ export const backendConfig = {
   port: Number(process.env.PORT || 3001),
   dataDir: path.resolve(__dirname, 'data'),
   notificationChannels: list(process.env.NOTIFICATION_CHANNELS, 'WHATSAPP,EMAIL'),
+  instagramUsername: process.env.INSTAGRAM_USERNAME || 'host.illam',
   host: {
     whatsappNumber: String(process.env.HOST_WHATSAPP_NUMBER || '919747232233').replace(/\D/g, ''),
     email: process.env.HOST_EMAIL || 'hello@hostillam.com',

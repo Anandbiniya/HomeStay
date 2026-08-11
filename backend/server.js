@@ -9,6 +9,10 @@ import {
   listLeads,
   LEAD_STATUSES,
 } from './services/leadService.js'
+import {
+  getConfiguredInstagramUsername,
+  getInstagramReelsFeed,
+} from './services/instagramService.js'
 
 const app = express()
 app.use(cors())
@@ -20,7 +24,26 @@ app.get('/api/health', (_req, res) => {
     service: 'hostillam-lead-api',
     channels: backendConfig.notificationChannels,
     leadStatuses: LEAD_STATUSES,
+    instagramUsername: getConfiguredInstagramUsername(),
   })
+})
+
+app.get('/api/instagram/reels', async (req, res) => {
+  try {
+    const username = String(req.query.username || getConfiguredInstagramUsername())
+    const force = String(req.query.refresh || '') === '1'
+    const feed = await getInstagramReelsFeed({ username, force })
+    res.set('Cache-Control', 'public, max-age=300')
+    return res.json(feed)
+  } catch (error) {
+    console.error('[instagram]', error.message)
+    return res.status(502).json({
+      error: 'Could not load Instagram reels right now',
+      detail: error.message,
+      profileUrl: `https://www.instagram.com/${getConfiguredInstagramUsername()}/`,
+      reels: [],
+    })
+  }
 })
 
 app.post('/api/events', async (req, res) => {

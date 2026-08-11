@@ -239,11 +239,11 @@
     color: var(--color-amber-soft);
   }
 
-  .gallery-label::before {
-    content: "";
-    width: 1.4rem;
-    height: 1px;
-    background: var(--color-amber-soft);
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
   }
 }
 
