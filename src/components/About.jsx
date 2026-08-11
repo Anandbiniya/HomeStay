@@ -1,11 +1,9 @@
 import aboutImage from '../assets/images/about.jpg'
 import { aboutHighlights } from '../data/content'
 import { useReveal } from '../hooks/useReveal'
-import SectionCta from './SectionCta'
 
-export default function About({ variant = 'full' }) {
+export default function About() {
   const ref = useReveal()
-  const isPreview = variant === 'preview'
 
   return (
     <section id="about" className="section">
@@ -46,12 +44,6 @@ export default function About({ variant = 'full' }) {
                 </div>
               ))}
             </div>
-
-            {isPreview ? (
-              <div className="mt-8">
-                <SectionCta to="/about">Explore more about Hostillam</SectionCta>
-              </div>
-            ) : null}
           </div>
         </div>
       </div>

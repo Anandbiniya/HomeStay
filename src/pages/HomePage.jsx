@@ -2,11 +2,10 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import PageShell from '../components/PageShell'
 import Hero from '../components/Hero'
-import Intro from '../components/Intro'
+import About from '../components/About'
 import Stay from '../components/Stay'
 import Experience from '../components/Experience'
 import InstagramReels from '../components/InstagramReels'
-import About from '../components/About'
 import Reviews from '../components/Reviews'
 import VolunteerTeaser from '../components/VolunteerTeaser'
 import Gallery from '../components/Gallery'
@@ -14,9 +13,8 @@ import Location from '../components/Location'
 import Booking from '../components/Booking'
 import { siteConfig } from '../config/site'
 
-/** Legacy home hashes now map to dedicated pages. */
+/** Legacy home hashes now map to dedicated pages (except about — stays on home). */
 const HASH_REDIRECTS = {
-  about: '/about',
   stay: '/stay',
   camping: '/camping',
   experience: '/experience',
@@ -41,7 +39,7 @@ export default function HomePage() {
       return undefined
     }
 
-    // Keep booking (and any remaining in-page anchors) scroll behaviour.
+    // Keep #about and booking (and any remaining in-page anchors) on the home page.
     const timer = window.setTimeout(() => {
       const target = document.getElementById(hash)
       if (!target) return
@@ -57,7 +55,7 @@ export default function HomePage() {
   return (
     <PageShell>
       <Hero />
-      <Intro />
+      <About />
       <Stay variant="preview" pagePath="/" />
       <Experience variant="preview" />
       <InstagramReels
@@ -65,7 +63,6 @@ export default function HomePage() {
         title="See Hostillam"
         lead="Real moments from @host.illam — campfires, trails, and quiet hill days."
       />
-      <About variant="preview" />
       <Reviews variant="preview" />
       <VolunteerTeaser />
       <Gallery variant="preview" pagePath="/" />

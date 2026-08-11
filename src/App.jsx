@@ -5,7 +5,6 @@ import StayPage from './pages/StayPage'
 import CampingPage from './pages/CampingPage'
 import CampingDetailPage from './pages/CampingDetailPage'
 import ExperiencePage from './pages/ExperiencePage'
-import AboutPage from './pages/AboutPage'
 import VolunteerPage from './pages/VolunteerPage'
 import GalleryPage from './pages/GalleryPage'
 import ReelsPage from './pages/ReelsPage'
@@ -22,7 +21,7 @@ export default function App() {
           <Route path="/camping" element={<CampingPage />} />
           <Route path="/camping/:slug" element={<CampingDetailPage />} />
           <Route path="/experience" element={<ExperiencePage />} />
-          <Route path="/about" element={<AboutPage />} />
+          <Route path="/about" element={<Navigate to="/#about" replace />} />
           <Route path="/volunteer" element={<VolunteerPage />} />
           <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/reels" element={<ReelsPage />} />

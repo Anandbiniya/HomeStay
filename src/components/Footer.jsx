@@ -20,11 +20,17 @@ export default function Footer() {
         <div>
           <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-amber-soft">Explore</h3>
           <nav className="mt-4 flex flex-col gap-2">
-            {siteConfig.footerExplore.map((item) => (
-              <Link key={item.href} to={item.href} className="text-white/80 hover:text-white">
-                {item.label}
-              </Link>
-            ))}
+            {siteConfig.footerExplore.map((item) =>
+              item.href.includes('#') ? (
+                <a key={item.href} href={item.href} className="text-white/80 hover:text-white">
+                  {item.label}
+                </a>
+              ) : (
+                <Link key={item.href} to={item.href} className="text-white/80 hover:text-white">
+                  {item.label}
+                </Link>
+              ),
+            )}
           </nav>
         </div>
 
