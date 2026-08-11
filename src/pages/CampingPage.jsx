@@ -8,6 +8,7 @@ import { campingOptions } from '../data/content'
 import { useLead } from '../context/LeadContext'
 import { useReveal } from '../hooks/useReveal'
 import { Events } from '../services/trackingService'
+import heroCampImage from '../assets/images/stay-tent.jpg'
 
 function priceDisplay(option) {
   if (option.price) {
@@ -25,6 +26,8 @@ export default function CampingPage() {
   usePageMeta('Camping')
   const ref = useReveal()
   const { requestBookNow, trackEvent } = useLead()
+  const heroImage =
+    campingOptions.find((item) => item.id === 'tent-stay')?.image || heroCampImage
 
   const bookOption = (option, event) => {
     event.preventDefault()
@@ -39,20 +42,47 @@ export default function CampingPage() {
 
   return (
     <PageShell>
-      <div className="bg-pine-deep pt-24 text-white sm:pt-28">
-        <div className="container-site pb-10">
-          <p className="text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-amber-soft">
-            Camping · My Magik Place
-          </p>
-          <h1 className="mt-3 font-display text-[clamp(2.2rem,5vw,3.4rem)] font-semibold tracking-[-0.02em]">
-            Camping at My Magik Place
-          </h1>
-          <p className="mt-3 max-w-2xl text-[1.05rem] leading-relaxed text-white/75">
-            Day camping, tent stay, and make-your-own-pitch options — a separate Hostillam camping experience
-            from the Veedu homestay.
-          </p>
+      <section className="relative min-h-[70svh] overflow-hidden md:min-h-[78svh]">
+        <div className="hero-media absolute inset-0">
+          <img
+            src={heroImage}
+            alt="Camping at My Magik Place, Hostillam"
+            className="h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(19_40_33_/_0.5)_0%,rgb(19_40_33_/_0.28)_42%,rgb(19_40_33_/_0.8)_100%)]" />
         </div>
-      </div>
+        <div className="container-site relative flex min-h-[70svh] items-end pb-14 pt-28 md:min-h-[78svh] md:pb-20">
+          <div className="hero-copy max-w-3xl text-white">
+            <p className="mb-3 text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-white/80">
+              Camping · My Magik Place
+            </p>
+            <h1 className="font-display text-[clamp(2.6rem,7vw,4.4rem)] font-semibold leading-[1.02] tracking-[-0.03em]">
+              Camping at My Magik Place
+            </h1>
+            <p className="mt-4 max-w-2xl text-[1.08rem] leading-relaxed text-white/88">
+              Day camping, tent stay, and make-your-own-pitch options — a separate Hostillam camping
+              experience from the Veedu homestay.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a href="#camping" className="btn btn-primary">
+                Explore camping
+              </a>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() =>
+                  requestBookNow({
+                    accommodation: campingOptions[0]?.name,
+                    source: 'camping_hero',
+                  })
+                }
+              >
+                Book Now
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section id="camping" className="section">
         <div ref={ref} className="container-site reveal">
