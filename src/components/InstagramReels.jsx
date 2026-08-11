@@ -91,7 +91,7 @@ export default function InstagramReels() {
                 const playing = activeId === reel.id
                 return (
                   <article key={reel.id} className="card-surface overflow-hidden">
-                    <div className="relative aspect-[9/14] bg-pine-deep">
+                    <div className="relative aspect-[9/14] overflow-hidden bg-[linear-gradient(160deg,#d7e0d4_0%,#b7c7b2_55%,#8fa88a_100%)]">
                       {playing && reel.videoUrl ? (
                         <video
                           className="h-full w-full object-cover"
@@ -100,6 +100,7 @@ export default function InstagramReels() {
                           controls
                           autoPlay
                           playsInline
+                          preload="metadata"
                         />
                       ) : (
                         <>
@@ -108,10 +109,15 @@ export default function InstagramReels() {
                             alt={reel.caption?.slice(0, 80) || `Instagram reel by @${handle}`}
                             className="h-full w-full object-cover"
                             loading="lazy"
+                            decoding="async"
+                            referrerPolicy="no-referrer"
+                            onError={(event) => {
+                              event.currentTarget.style.opacity = '0'
+                            }}
                           />
                           <button
                             type="button"
-                            className="absolute inset-0 flex items-center justify-center bg-pine-deep/25 transition hover:bg-pine-deep/35"
+                            className="absolute inset-0 flex items-center justify-center bg-black/15 transition hover:bg-black/25"
                             onClick={() => {
                               if (reel.videoUrl) setActiveId(reel.id)
                               else window.open(reel.permalink, '_blank', 'noopener,noreferrer')

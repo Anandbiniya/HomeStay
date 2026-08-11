@@ -10,8 +10,10 @@ import {
   LEAD_STATUSES,
 } from './services/leadService.js'
 import {
+  fetchInstagramMedia,
   getConfiguredInstagramUsername,
   getInstagramReelsFeed,
+  withProxiedMediaUrls,
 } from './services/instagramService.js'
 
 const app = express()
@@ -34,7 +36,8 @@ app.get('/api/instagram/reels', async (req, res) => {
     const force = String(req.query.refresh || '') === '1'
     const feed = await getInstagramReelsFeed({ username, force })
     res.set('Cache-Control', 'public, max-age=300')
-    return res.json(feed)
+    // Proxy CDN media URLs so browsers are not blocked by Instagram CORP headers.
+    return res.json(withProxiedMediaUrls(feed))
   } catch (error) {
     console.error('[instagram]', error.message)
     return res.status(502).json({
@@ -43,6 +46,23 @@ app.get('/api/instagram/reels', async (req, res) => {
       profileUrl: `https://www.instagram.com/${getConfiguredInstagramUsername()}/`,
       reels: [],
     })
+  }
+})
+
+app.get('/api/instagram/media', async (req, res) => {
+  try {
+    const mediaUrl = String(req.query.url || '')
+    const { contentType, buffer } = await fetchInstagramMedia(mediaUrl)
+    res.set({
+      'Content-Type': contentType,
+      'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
+      'Cross-Origin-Resource-Policy': 'cross-origin',
+    })
+    return res.send(buffer)
+  } catch (error) {
+    const status = error.status && Number.isInteger(error.status) ? error.status : 502
+    console.error('[instagram-media]', error.message)
+    return res.status(status).json({ error: 'Could not load Instagram media' })
   }
 })
 

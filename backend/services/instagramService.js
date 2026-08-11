@@ -145,6 +145,74 @@ export function getConfiguredInstagramUsername() {
   return process.env.INSTAGRAM_USERNAME || backendConfig.instagramUsername || DEFAULT_USERNAME
 }
 
+const ALLOWED_MEDIA_HOST_SUFFIXES = [
+  'cdninstagram.com',
+  'fbcdn.net',
+  'instagram.com',
+]
+
+export function isAllowedInstagramMediaUrl(rawUrl) {
+  try {
+    const parsed = new URL(String(rawUrl || ''))
+    if (parsed.protocol !== 'https:') return false
+    const host = parsed.hostname.toLowerCase()
+    return ALLOWED_MEDIA_HOST_SUFFIXES.some(
+      (suffix) => host === suffix || host.endsWith(`.${suffix}`),
+    )
+  } catch {
+    return false
+  }
+}
+
+/** Browser-safe URL so Instagram CDN covers are not blocked by CORP. */
+export function toProxiedMediaUrl(absoluteUrl) {
+  if (!absoluteUrl || !isAllowedInstagramMediaUrl(absoluteUrl)) return absoluteUrl || ''
+  return `/api/instagram/media?url=${encodeURIComponent(absoluteUrl)}`
+}
+
+export function withProxiedMediaUrls(feed) {
+  if (!feed) return feed
+  return {
+    ...feed,
+    profilePicUrl: toProxiedMediaUrl(feed.profilePicUrl),
+    reels: (feed.reels || []).map((reel) => ({
+      ...reel,
+      thumbnailUrl: toProxiedMediaUrl(reel.thumbnailUrl),
+      videoUrl: reel.videoUrl ? toProxiedMediaUrl(reel.videoUrl) : null,
+    })),
+  }
+}
+
+export async function fetchInstagramMedia(rawUrl) {
+  if (!isAllowedInstagramMediaUrl(rawUrl)) {
+    const error = new Error('Unsupported media URL')
+    error.status = 400
+    throw error
+  }
+
+  const response = await fetch(rawUrl, {
+    headers: {
+      'User-Agent':
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      Accept: 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
+      'Accept-Language': 'en-US,en;q=0.9',
+      Referer: 'https://www.instagram.com/',
+      Origin: 'https://www.instagram.com',
+    },
+    redirect: 'follow',
+  })
+
+  if (!response.ok) {
+    const error = new Error(`Instagram media fetch failed (${response.status})`)
+    error.status = response.status
+    throw error
+  }
+
+  const contentType = response.headers.get('content-type') || 'application/octet-stream'
+  const buffer = Buffer.from(await response.arrayBuffer())
+  return { contentType, buffer }
+}
+
 /** Seed cache from a previously saved Instagram API response (useful after rate limits). */
 export async function seedInstagramCacheFromRawProfile(rawJson, username = DEFAULT_USERNAME) {
   const user = rawJson?.data?.user
