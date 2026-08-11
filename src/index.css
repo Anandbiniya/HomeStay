@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-display: "Cormorant Garamond", "Palatino Linotype", Palatino, Georgia, serif;
   --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
 
   --color-pine: #1c3a32;
@@ -16,6 +16,7 @@
   --color-amber: #a88945;
   --color-amber-soft: #c4a96a;
   --color-cream-leaf: #e7ebe4;
+  --color-ivory: #f3efe6;
 
   --radius-card: 1.25rem;
   --radius-btn: 0.9rem;
@@ -85,10 +86,10 @@
 
   .section-title {
     font-family: var(--font-display);
-    font-weight: 550;
-    font-size: clamp(2rem, 4.4vw, 3.15rem);
-    line-height: 1.12;
-    letter-spacing: -0.02em;
+    font-weight: 600;
+    font-size: clamp(2.1rem, 4.6vw, 3.25rem);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
     color: var(--color-pine-deep);
     margin: 0.65rem 0 0;
   }
