@@ -155,7 +155,6 @@ export function getGalleryByIds(ids = []) {
 export const bookableOptions = [
   hostillamVeedu,
   ...campingOptions,
-  accommodations.find((item) => item.id === 'room'),
 ].filter(Boolean)
 
 export const experiences = [
