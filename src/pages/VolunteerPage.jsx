@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import PageShell from '../components/PageShell'
+import { BackLink, Breadcrumbs } from '../components/PageNav'
 import { useReveal } from '../hooks/useReveal'
 import { usePageMeta } from '../hooks/usePageMeta'
 import { volunteerContent } from '../data/volunteer'
@@ -110,6 +111,14 @@ export default function VolunteerPage() {
 
         <div className="container-site relative flex min-h-[72svh] items-end pb-14 pt-28 md:min-h-[78svh] md:items-center md:pb-20 md:pt-24">
           <div className="hero-copy max-w-3xl text-white">
+            <div className="mb-4">
+              <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Volunteer' }]} />
+            </div>
+            <div className="mb-5">
+              <BackLink to="/" className="text-white/90 hover:text-white">
+                Back to Home
+              </BackLink>
+            </div>
             <p className="mb-4 text-[0.8rem] font-semibold uppercase tracking-[0.22em] text-white/80">
               {volunteerContent.hero.label}
             </p>

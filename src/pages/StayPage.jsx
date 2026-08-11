@@ -2,6 +2,7 @@ import PageShell from '../components/PageShell'
 import Reviews from '../components/Reviews'
 import Booking from '../components/Booking'
 import InstagramReels from '../components/InstagramReels'
+import { BackLink, Breadcrumbs } from '../components/PageNav'
 import { usePageMeta } from '../hooks/usePageMeta'
 import { hostillamVeedu, getGalleryByIds } from '../data/content'
 import { useLead } from '../context/LeadContext'
@@ -37,6 +38,20 @@ export default function StayPage() {
         </div>
         <div className="container-site relative flex min-h-[70svh] items-end pb-14 pt-28 md:min-h-[78svh] md:pb-20">
           <div className="hero-copy max-w-3xl text-white">
+            <div className="mb-4">
+              <Breadcrumbs
+                items={[
+                  { label: 'Home', to: '/' },
+                  { label: 'Stay' },
+                  { label: 'Hostillam Veedu' },
+                ]}
+              />
+            </div>
+            <div className="mb-5">
+              <BackLink to="/" className="text-white/90 hover:text-white">
+                Back to Home
+              </BackLink>
+            </div>
             <p className="mb-3 text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-white/80">
               Stay · {veedu.type}
             </p>
@@ -158,6 +173,8 @@ export default function StayPage() {
         accommodationLabel="Accommodation"
         title="Book Hostillam Veedu"
         lead="Hostillam Veedu is already selected. Share your dates and details — we open WhatsApp so you can finish with the host."
+        returnTo="/stay"
+        returnLabel="Back to Stay"
       />
     </PageShell>
   )

@@ -1,6 +1,7 @@
 import { Link, Navigate, useParams } from 'react-router-dom'
 import PageShell from '../components/PageShell'
 import Booking from '../components/Booking'
+import { BackLink, Breadcrumbs } from '../components/PageNav'
 import { usePageMeta } from '../hooks/usePageMeta'
 import { getCampingOptionBySlug, getGalleryByIds } from '../data/content'
 import { useLead } from '../context/LeadContext'
@@ -36,6 +37,20 @@ export default function CampingDetailPage() {
         </div>
         <div className="container-site relative flex min-h-[68svh] items-end pb-14 pt-28 md:min-h-[74svh] md:pb-20">
           <div className="hero-copy max-w-3xl text-white">
+            <div className="mb-4">
+              <Breadcrumbs
+                items={[
+                  { label: 'Home', to: '/' },
+                  { label: 'Camping', to: '/camping' },
+                  { label: option.name },
+                ]}
+              />
+            </div>
+            <div className="mb-5">
+              <BackLink to="/camping" className="text-white/90 hover:text-white">
+                Back to Camping
+              </BackLink>
+            </div>
             <p className="mb-3 text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-white/80">
               {option.siteLabel} · {option.type}
             </p>
@@ -48,7 +63,7 @@ export default function CampingDetailPage() {
                 Book Now
               </button>
               <Link to="/camping" className="btn btn-secondary">
-                All camping options
+                ← Back to Camping
               </Link>
             </div>
           </div>
@@ -128,6 +143,8 @@ export default function CampingDetailPage() {
         accommodationLabel="Camping option"
         title={`Book ${option.name}`}
         lead={`${option.name} is already selected. Share your details and we open WhatsApp with the host.`}
+        returnTo="/camping"
+        returnLabel="Back to Camping"
       />
     </PageShell>
   )

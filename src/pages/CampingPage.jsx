@@ -3,6 +3,7 @@ import PageShell from '../components/PageShell'
 import Booking from '../components/Booking'
 import MyMagikPlaceReels from '../components/MyMagikPlaceReels'
 import MyMagikPlaceReviews from '../components/MyMagikPlaceReviews'
+import { BackLink, Breadcrumbs } from '../components/PageNav'
 import { usePageMeta } from '../hooks/usePageMeta'
 import { campingOptions } from '../data/content'
 import { useLead } from '../context/LeadContext'
@@ -53,6 +54,14 @@ export default function CampingPage() {
         </div>
         <div className="container-site relative flex min-h-[70svh] items-end pb-14 pt-28 md:min-h-[78svh] md:pb-20">
           <div className="hero-copy max-w-3xl text-white">
+            <div className="mb-4">
+              <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Camping' }]} />
+            </div>
+            <div className="mb-5">
+              <BackLink to="/" className="text-white/90 hover:text-white">
+                Back to Home
+              </BackLink>
+            </div>
             <p className="mb-3 text-[0.78rem] font-semibold uppercase tracking-[0.18em] text-white/80">
               Camping · My Magik Place
             </p>
@@ -153,6 +162,8 @@ export default function CampingPage() {
         accommodationLabel="Camping option"
         title="Book a camping experience"
         lead="Choose Day Camping, Tent Stay, or Make Your Own Pitch Tent — or tap Book Now on a card to pre-select it."
+        returnTo="/camping"
+        returnLabel="Back to Camping options"
       />
     </PageShell>
   )

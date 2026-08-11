@@ -109,7 +109,7 @@ export default function Reviews({
             rel="noreferrer"
             className="btn btn-outline"
           >
-            See all Google reviews
+            Read Google Reviews ↗
           </a>
           <p className="text-sm text-muted">
             {variant === 'all'

@@ -5,6 +5,7 @@ import StayPage from './pages/StayPage'
 import CampingPage from './pages/CampingPage'
 import CampingDetailPage from './pages/CampingDetailPage'
 import ExperiencePage from './pages/ExperiencePage'
+import AboutPage from './pages/AboutPage'
 import VolunteerPage from './pages/VolunteerPage'
 import GalleryPage from './pages/GalleryPage'
 import ReelsPage from './pages/ReelsPage'
@@ -17,16 +18,18 @@ export default function App() {
       <LeadProvider>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/about" element={<AboutPage />} />
           <Route path="/stay" element={<StayPage />} />
+          <Route path="/stay/hostillam-veedu" element={<Navigate to="/stay" replace />} />
           <Route path="/camping" element={<CampingPage />} />
           <Route path="/camping/:slug" element={<CampingDetailPage />} />
           <Route path="/experience" element={<ExperiencePage />} />
-          <Route path="/about" element={<Navigate to="/#about" replace />} />
           <Route path="/volunteer" element={<VolunteerPage />} />
           <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/reels" element={<ReelsPage />} />
           <Route path="/reviews" element={<ReviewsPage />} />
           <Route path="/location" element={<LocationPage />} />
+          <Route path="/booking" element={<Navigate to="/#booking" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </LeadProvider>

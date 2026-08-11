@@ -6,6 +6,7 @@ import { useLead } from '../context/LeadContext'
 import { Events } from '../services/trackingService'
 import { notifyHostFromBookingEnquiry } from '../services/notificationService'
 import { openWhatsAppBooking } from '../utils/whatsapp'
+import { BackLink } from './PageNav'
 
 const initialForm = {
   name: '',
@@ -24,6 +25,8 @@ export default function Booking({
   accommodationLabel = 'Accommodation',
   title,
   lead,
+  returnTo,
+  returnLabel,
 }) {
   const ref = useReveal()
   const { contact, bookingPrefill, ensureContact, trackEvent } = useLead()
@@ -38,6 +41,8 @@ export default function Booking({
 
   const today = useMemo(() => new Date().toISOString().split('T')[0], [])
   const accommodationLocked = Boolean(lockedAccommodation)
+  const backTo = returnTo || bookingPrefill?.returnTo || ''
+  const backLabel = returnLabel || 'Back to previous page'
 
   useEffect(() => {
     if (!lockedAccommodation) return
@@ -171,6 +176,11 @@ export default function Booking({
       <div ref={ref} className="container-site reveal">
         <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
           <div>
+            {backTo ? (
+              <div className="mb-4">
+                <BackLink to={backTo}>{backLabel}</BackLink>
+              </div>
+            ) : null}
             <p className="section-label">Booking</p>
             <h2 className="section-title">
               {title || 'Reserve your stay through WhatsApp'}

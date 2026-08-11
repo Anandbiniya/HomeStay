@@ -7,11 +7,42 @@ import { getWhatsAppUrl } from '../utils/whatsapp'
 
 const LeadContext = createContext(null)
 
-function scrollToBookingSection() {
+const BOOKING_PREFILL_KEY = 'hostillam_booking_prefill'
+
+function persistBookingPrefill(prefill) {
+  try {
+    sessionStorage.setItem(
+      BOOKING_PREFILL_KEY,
+      JSON.stringify({
+        accommodation: prefill?.accommodation || '',
+        guests: prefill?.guests || '2',
+        returnTo: prefill?.returnTo || '',
+        nonce: Date.now(),
+      }),
+    )
+  } catch {
+    // Ignore storage failures (private mode, etc.)
+  }
+}
+
+export function consumeStoredBookingPrefill() {
+  try {
+    const raw = sessionStorage.getItem(BOOKING_PREFILL_KEY)
+    if (!raw) return null
+    sessionStorage.removeItem(BOOKING_PREFILL_KEY)
+    return JSON.parse(raw)
+  } catch {
+    return null
+  }
+}
+
+function scrollToBookingSection(prefill = null) {
   document.body.style.overflow = ''
   const target = document.getElementById('booking')
   if (!target) {
-    // Book Now from other pages (e.g. Volunteer) should land on the home booking section.
+    // Book Now from pages without a booking section should land on home booking,
+    // preserving the selected option across the navigation.
+    if (prefill) persistBookingPrefill(prefill)
     window.location.assign('/#booking')
     return false
   }
@@ -25,7 +56,7 @@ function scrollToBookingSection() {
   window.scrollTo(0, Math.max(0, top))
 
   if (window.location.hash !== '#booking') {
-    window.history.replaceState(null, '', '#booking')
+    window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}#booking`)
   }
   return true
 }
@@ -50,6 +81,11 @@ export function LeadProvider({ children }) {
 
   useEffect(() => {
     getVisitorId()
+    const storedPrefill = consumeStoredBookingPrefill()
+    if (storedPrefill) {
+      setBookingPrefill(storedPrefill)
+      window.setTimeout(() => ensureBookingInView(0), 80)
+    }
     const key = 'hostillam_page_view_sent'
     if (sessionStorage.getItem(key)) return undefined
     sessionStorage.setItem(key, '1')
@@ -93,18 +129,20 @@ export function LeadProvider({ children }) {
   )
 
   const openBooking = useCallback((prefill = {}) => {
-    setBookingPrefill({
+    const nextPrefill = {
       accommodation: prefill.accommodation || '',
       guests: prefill.guests || '2',
+      returnTo: prefill.returnTo || '',
       ...prefill,
       nonce: Date.now(),
-    })
+    }
+    setBookingPrefill(nextPrefill)
     trackEvent(Events.BOOKING_FORM_OPENED, {
-      page: '/#booking',
-      accommodation: prefill.accommodation || null,
+      page: window.location.pathname || '/#booking',
+      accommodation: nextPrefill.accommodation || null,
     })
 
-    scrollToBookingSection()
+    scrollToBookingSection(nextPrefill)
     ensureBookingInView(0)
   }, [])
 
@@ -133,7 +171,15 @@ export function LeadProvider({ children }) {
       if (resolve) resolve(nextContact)
 
       if (shouldOpenBooking) {
-        openBooking({ accommodation: modalMeta.accommodation || '' })
+        openBooking({
+          accommodation: modalMeta.accommodation || '',
+          returnTo:
+            window.location.pathname.startsWith('/camping')
+              ? '/camping'
+              : window.location.pathname.startsWith('/stay')
+                ? '/stay'
+                : '',
+        })
       }
 
       notifyHostFromLeadCapture({
@@ -170,9 +216,9 @@ export function LeadProvider({ children }) {
   )
 
   const requestBookNow = useCallback(
-    ({ accommodation, source = 'book_now' } = {}) => {
+    ({ accommodation, source = 'book_now', returnTo } = {}) => {
       trackEvent(Events.BOOK_NOW_CLICKED, {
-        page: '/#booking',
+        page: window.location.pathname || '/#booking',
         accommodation: accommodation || null,
         data: { source },
       })
@@ -180,10 +226,21 @@ export function LeadProvider({ children }) {
         accommodation: accommodation || null,
       })
 
+      const prefill = {
+        accommodation: accommodation || '',
+        returnTo:
+          returnTo ||
+          (window.location.pathname.startsWith('/camping')
+            ? '/camping'
+            : window.location.pathname.startsWith('/stay')
+              ? '/stay'
+              : ''),
+      }
+
       const existing = getStoredLeadContact()
       if (existing?.phone) {
         setContact(existing)
-        openBooking({ accommodation: accommodation || '' })
+        openBooking(prefill)
         return Promise.resolve(existing)
       }
 
@@ -196,7 +253,7 @@ export function LeadProvider({ children }) {
         // Booking open is handled in handleLeadSubmit for the first-time path.
         if (!lead) return null
         if (getStoredLeadContact()?.phone) {
-          openBooking({ accommodation: accommodation || '' })
+          openBooking(prefill)
         }
         return lead
       })
