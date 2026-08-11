@@ -1,8 +1,9 @@
 import { siteConfig } from '../config/site'
-import { getWhatsAppUrl } from '../utils/whatsapp'
+import { useLead } from '../context/LeadContext'
 
 export default function Footer() {
   const year = new Date().getFullYear()
+  const { requestBookNow, requestWhatsAppContact } = useLead()
 
   return (
     <footer className="border-t border-pine/10 bg-pine-deep text-white">
@@ -32,14 +33,18 @@ export default function Footer() {
             <p>{siteConfig.location.address}</p>
             <p>
               WhatsApp:{' '}
-              <a
-                href={getWhatsAppUrl('Hello Hostillam,')}
-                target="_blank"
-                rel="noreferrer"
+              <button
+                type="button"
+                onClick={() =>
+                  requestWhatsAppContact({
+                    source: 'footer',
+                    message: 'I would like to enquire about a booking.',
+                  })
+                }
                 className="text-white hover:underline"
               >
                 {siteConfig.whatsapp.display}
-              </a>
+              </button>
             </p>
             <p>
               Phone:{' '}
@@ -66,6 +71,9 @@ export default function Footer() {
                 </a>
               </p>
             ) : null}
+            <button type="button" className="btn btn-primary !mt-2" onClick={() => requestBookNow({ source: 'footer' })}>
+              Book Now
+            </button>
           </div>
         </div>
       </div>

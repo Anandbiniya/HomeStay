@@ -1,8 +1,10 @@
 import heroImage from '../assets/images/hero.jpg'
 import { siteConfig } from '../config/site'
-import { getWhatsAppUrl } from '../utils/whatsapp'
+import { useLead } from '../context/LeadContext'
 
 export default function Hero() {
+  const { requestBookNow } = useLead()
+
   return (
     <section id="home" className="relative min-h-[100svh] overflow-hidden">
       <div className="hero-media absolute inset-0">
@@ -27,16 +29,13 @@ export default function Hero() {
             Soulful stays and serene camping in the hills of Kodaikanal — a warm home for beautiful minds.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <a
-              href={getWhatsAppUrl(
-                'Hello Hostillam,\n\nI would like to enquire about a booking.\n\nPlease let me know about availability.\n\nThank you.',
-              )}
-              target="_blank"
-              rel="noreferrer"
+            <button
+              type="button"
               className="btn btn-primary"
+              onClick={() => requestBookNow({ source: 'hero' })}
             >
               Book via WhatsApp
-            </a>
+            </button>
             <a href="#stay" className="btn btn-secondary">
               Explore Stay
             </a>

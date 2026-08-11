@@ -1,5 +1,10 @@
+import { LeadProvider } from './context/LeadContext'
 import HomePage from './pages/HomePage'
 
 export default function App() {
-  return <HomePage />
+  return (
+    <LeadProvider>
+      <HomePage />
+    </LeadProvider>
+  )
 }

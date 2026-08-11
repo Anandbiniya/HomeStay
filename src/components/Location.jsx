@@ -1,11 +1,35 @@
 import locationImage from '../assets/images/location.jpg'
 import { siteConfig } from '../config/site'
 import { useReveal } from '../hooks/useReveal'
-import { getWhatsAppUrl } from '../utils/whatsapp'
+import { useLead } from '../context/LeadContext'
+import { Events } from '../services/trackingService'
 
 export default function Location() {
   const ref = useReveal()
   const { location, phone, email, social, whatsapp } = siteConfig
+  const { requestWhatsAppContact, requestContactHost, trackEvent } = useLead()
+
+  const onMaps = async () => {
+    await trackEvent(Events.LOCATION_CLICKED, {
+      page: '/#location',
+      data: { target: 'maps' },
+    })
+  }
+
+  const onWhatsApp = async (event) => {
+    event.preventDefault()
+    await requestWhatsAppContact({
+      source: 'location',
+      message: 'I would like to enquire about a booking.',
+    })
+  }
+
+  const onPhone = async () => {
+    await trackEvent(Events.CONTACT_CLICKED, {
+      page: '/#location',
+      data: { channel: 'phone' },
+    })
+  }
 
   return (
     <section id="location" className="section bg-[rgb(231_235_228_/_0.45)]">
@@ -33,20 +57,23 @@ export default function Location() {
               <InfoRow
                 label="WhatsApp"
                 value={
-                  <a
-                    href={getWhatsAppUrl('Hello Hostillam,')}
-                    target="_blank"
-                    rel="noreferrer"
+                  <button
+                    type="button"
+                    onClick={onWhatsApp}
                     className="font-semibold text-pine hover:underline"
                   >
                     {whatsapp.display}
-                  </a>
+                  </button>
                 }
               />
               <InfoRow
                 label="Phone"
                 value={
-                  <a href={`tel:${phone.number}`} className="font-semibold text-pine hover:underline">
+                  <a
+                    href={`tel:${phone.number}`}
+                    onClick={onPhone}
+                    className="font-semibold text-pine hover:underline"
+                  >
                     {phone.display}
                   </a>
                 }
@@ -54,7 +81,16 @@ export default function Location() {
               <InfoRow
                 label="Email"
                 value={
-                  <a href={`mailto:${email}`} className="font-semibold text-pine hover:underline">
+                  <a
+                    href={`mailto:${email}`}
+                    onClick={() =>
+                      trackEvent(Events.CONTACT_CLICKED, {
+                        page: '/#location',
+                        data: { channel: 'email' },
+                      })
+                    }
+                    className="font-semibold text-pine hover:underline"
+                  >
                     {email}
                   </a>
                 }
@@ -76,22 +112,25 @@ export default function Location() {
               ) : null}
 
               <div className="mt-5 flex flex-wrap gap-3">
-                <a
-                  href={getWhatsAppUrl('Hello Hostillam,\n\nI would like to enquire about a booking.')}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="btn btn-whatsapp"
-                >
+                <button type="button" onClick={onWhatsApp} className="btn btn-whatsapp">
                   Chat on WhatsApp
-                </a>
+                </button>
                 <a
                   href={location.mapLink}
                   target="_blank"
                   rel="noreferrer"
                   className="btn btn-outline"
+                  onClick={onMaps}
                 >
                   Open in Maps
                 </a>
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  onClick={() => requestContactHost()}
+                >
+                  Contact Host
+                </button>
               </div>
             </div>
           </div>

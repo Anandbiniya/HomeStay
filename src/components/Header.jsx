@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
+import { useLead } from '../context/LeadContext'
 import { siteConfig } from '../config/site'
-import { getWhatsAppUrl } from '../utils/whatsapp'
 
 export default function Header() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const { requestBookNow } = useLead()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -21,6 +22,12 @@ export default function Header() {
   }, [open])
 
   const close = () => setOpen(false)
+
+  const onBookNow = async (event) => {
+    event.preventDefault()
+    close()
+    await requestBookNow({ source: 'header' })
+  }
 
   return (
     <header
@@ -56,14 +63,9 @@ export default function Header() {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
-          <a
-            href={getWhatsAppUrl('Hello Hostillam,\n\nI would like to enquire about a booking.')}
-            target="_blank"
-            rel="noreferrer"
-            className="btn btn-primary !min-h-11 !px-5 !text-sm"
-          >
+          <button type="button" onClick={onBookNow} className="btn btn-primary !min-h-11 !px-5 !text-sm">
             Book Now
-          </a>
+          </button>
         </div>
 
         <button
@@ -98,11 +100,7 @@ export default function Header() {
         </button>
       </div>
 
-      <div
-        className={`border-t border-pine/10 bg-mist-soft lg:hidden ${
-          open ? 'block' : 'hidden'
-        }`}
-      >
+      <div className={`border-t border-pine/10 bg-mist-soft lg:hidden ${open ? 'block' : 'hidden'}`}>
         <nav className="container-site flex flex-col gap-1 py-4">
           {siteConfig.nav.map((item) => (
             <a
@@ -114,15 +112,9 @@ export default function Header() {
               {item.label}
             </a>
           ))}
-          <a
-            href={getWhatsAppUrl('Hello Hostillam,\n\nI would like to enquire about a booking.')}
-            target="_blank"
-            rel="noreferrer"
-            onClick={close}
-            className="btn btn-primary mt-2 w-full"
-          >
+          <button type="button" onClick={onBookNow} className="btn btn-primary mt-2 w-full">
             Book Now
-          </a>
+          </button>
         </nav>
       </div>
     </header>

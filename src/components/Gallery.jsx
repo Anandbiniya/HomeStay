@@ -1,11 +1,13 @@
 import { galleryImages } from '../data/content'
 import { useReveal } from '../hooks/useReveal'
+import TrackOnce from './TrackOnce'
+import { Events } from '../services/trackingService'
 
 export default function Gallery() {
   const ref = useReveal()
 
   return (
-    <section id="gallery" className="section bg-pine-deep text-white">
+    <TrackOnce as="section" id="gallery" className="section bg-pine-deep text-white" event={Events.GALLERY_OPENED} page="/#gallery">
       <div ref={ref} className="container-site reveal">
         <div className="max-w-2xl">
           <p className="gallery-label">Gallery</p>
@@ -31,6 +33,6 @@ export default function Gallery() {
           ))}
         </div>
       </div>
-    </section>
+    </TrackOnce>
   )
 }

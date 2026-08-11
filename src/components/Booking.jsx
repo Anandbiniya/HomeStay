@@ -1,12 +1,16 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { accommodations } from '../data/content'
 import { useReveal } from '../hooks/useReveal'
-import { openWhatsAppBooking } from '../utils/whatsapp'
 import { siteConfig } from '../config/site'
+import { useLead } from '../context/LeadContext'
+import { Events } from '../services/trackingService'
+import { notifyHostFromBookingEnquiry } from '../services/notificationService'
+import { openWhatsAppBooking } from '../utils/whatsapp'
 
 const initialForm = {
   name: '',
   phone: '',
+  email: '',
   guests: '2',
   accommodation: accommodations[0]?.name || '',
   checkIn: '',
@@ -16,10 +20,35 @@ const initialForm = {
 
 export default function Booking() {
   const ref = useReveal()
+  const { contact, bookingPrefill, ensureContact, trackEvent } = useLead()
   const [form, setForm] = useState(initialForm)
   const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [statusNote, setStatusNote] = useState('')
 
   const today = useMemo(() => new Date().toISOString().split('T')[0], [])
+
+  useEffect(() => {
+    if (!contact) return
+    setForm((prev) => ({
+      ...prev,
+      name: contact.name || prev.name,
+      phone: contact.phone || prev.phone,
+      email: contact.email || prev.email,
+    }))
+  }, [contact])
+
+  useEffect(() => {
+    if (!bookingPrefill) return
+    setForm((prev) => ({
+      ...prev,
+      accommodation: bookingPrefill.accommodation || prev.accommodation,
+      guests: bookingPrefill.guests || prev.guests,
+      name: contact?.name || prev.name,
+      phone: contact?.phone || prev.phone,
+      email: contact?.email || prev.email,
+    }))
+  }, [bookingPrefill, contact])
 
   const onChange = (event) => {
     const { name, value } = event.target
@@ -27,11 +56,36 @@ export default function Booking() {
     setError('')
   }
 
-  const onSubmit = (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault()
+    setStatusNote('')
 
-    if (!form.name.trim() || !form.phone.trim()) {
-      setError('Please share your name and phone number so the host can reply.')
+    await trackEvent(Events.BOOKING_FORM_SUBMITTED, {
+      page: '/#booking',
+      accommodation: form.accommodation,
+      data: {
+        guests: form.guests,
+        checkIn: form.checkIn,
+        checkOut: form.checkOut,
+      },
+    })
+
+    let leadContact = contact
+    if (!leadContact?.phone) {
+      leadContact = await ensureContact({
+        sourceEvent: Events.BOOKING_FORM_SUBMITTED,
+        accommodation: form.accommodation,
+        intent: 'BOOKING_ENQUIRY',
+      })
+      if (!leadContact) return
+    }
+
+    const name = (form.name || leadContact.name || '').trim()
+    const phone = (form.phone || leadContact.phone || '').trim()
+    const email = (form.email || leadContact.email || '').trim()
+
+    if (!phone) {
+      setError('Please share your phone number so the host can reply.')
       return
     }
 
@@ -45,15 +99,55 @@ export default function Booking() {
       return
     }
 
-    openWhatsAppBooking({
-      name: form.name.trim(),
-      phone: form.phone.trim(),
-      guests: form.guests,
-      accommodation: form.accommodation,
-      checkIn: form.checkIn,
-      checkOut: form.checkOut,
-      message: form.message.trim(),
-    })
+    setSubmitting(true)
+    setError('')
+
+    try {
+      await trackEvent(Events.BOOKING_ENQUIRY_STARTED, {
+        accommodation: form.accommodation,
+        data: { guests: form.guests, checkIn: form.checkIn, checkOut: form.checkOut },
+      })
+
+      const result = await notifyHostFromBookingEnquiry({
+        name,
+        phone,
+        email,
+        accommodation: form.accommodation,
+        guests: form.guests,
+        checkIn: form.checkIn,
+        checkOut: form.checkOut,
+        message: form.message.trim(),
+        sourceEvent: Events.BOOKING_ENQUIRY_COMPLETED,
+      })
+
+      await trackEvent(Events.BOOKING_ENQUIRY_COMPLETED, {
+        accommodation: form.accommodation,
+        data: {
+          leadId: result.lead?.id,
+          guests: form.guests,
+          checkIn: form.checkIn,
+          checkOut: form.checkOut,
+        },
+      })
+
+      openWhatsAppBooking({
+        name,
+        phone,
+        guests: form.guests,
+        accommodation: form.accommodation,
+        checkIn: form.checkIn,
+        checkOut: form.checkOut,
+        message: form.message.trim(),
+      })
+
+      setStatusNote(
+        'Enquiry sent to the host. WhatsApp is opening so you can continue the conversation. Booking is confirmed only after the host replies.',
+      )
+    } catch (err) {
+      setError(err.message || 'Could not send enquiry. Please try again.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -64,14 +158,14 @@ export default function Booking() {
             <p className="section-label">Booking</p>
             <h2 className="section-title">Reserve your stay through WhatsApp</h2>
             <p className="section-lead">
-              There is no online payment here. Share your details, and we will open WhatsApp with a
-              ready-to-send message for the host.
+              There is no online payment here. Share your details, and we notify the host securely, then
+              open WhatsApp so you can continue the conversation.
             </p>
 
             <div className="mt-8 space-y-4 rounded-[1.4rem] border border-pine/10 bg-white p-6 shadow-[var(--shadow-card)]">
               <p className="text-sm leading-relaxed text-muted">
-                Your request is sent directly to the host on WhatsApp. Booking is confirmed only after the
-                host responds and confirms availability.
+                Your request is sent to the host through our notification service. Booking is confirmed
+                only after the host responds and confirms availability.
               </p>
               <div className="rounded-xl bg-mist px-4 py-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-moss">WhatsApp</p>
@@ -96,12 +190,11 @@ export default function Booking() {
                   onChange={onChange}
                   className="field-input"
                   placeholder="Your full name"
-                  required
                   autoComplete="name"
                 />
               </Field>
 
-              <Field label="Phone number" htmlFor="phone">
+              <Field label="Phone number *" htmlFor="phone">
                 <input
                   id="phone"
                   name="phone"
@@ -112,6 +205,19 @@ export default function Booking() {
                   placeholder="+91 ..."
                   required
                   autoComplete="tel"
+                />
+              </Field>
+
+              <Field label="Email (optional)" htmlFor="email" className="sm:col-span-2">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={form.email}
+                  onChange={onChange}
+                  className="field-input"
+                  placeholder="you@email.com"
+                  autoComplete="email"
                 />
               </Field>
 
@@ -186,14 +292,19 @@ export default function Booking() {
               />
             </Field>
 
-            {error ? <p className="mt-3 text-sm font-medium text-red-700">{error}</p> : null}
+            <p className="mt-3 text-xs leading-relaxed text-muted">
+              Your contact details are used only to respond to your Hostillam enquiry.
+            </p>
 
-            <button type="submit" className="btn btn-whatsapp mt-5 w-full sm:w-auto">
-              Send enquiry on WhatsApp
+            {error ? <p className="mt-3 text-sm font-medium text-red-700">{error}</p> : null}
+            {statusNote ? <p className="mt-3 text-sm font-medium text-pine">{statusNote}</p> : null}
+
+            <button type="submit" className="btn btn-whatsapp mt-5 w-full sm:w-auto" disabled={submitting}>
+              {submitting ? 'Sending enquiry…' : 'Send enquiry on WhatsApp'}
             </button>
             <p className="mt-3 text-xs leading-relaxed text-muted">
-              Submitting opens WhatsApp with your details pre-filled. No payment is collected on this
-              website.
+              Submitting notifies the host and opens WhatsApp with your details. No payment is collected on
+              this website.
             </p>
           </form>
         </div>

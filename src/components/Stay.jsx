@@ -1,9 +1,21 @@
 import { accommodations } from '../data/content'
 import { useReveal } from '../hooks/useReveal'
-import { openWhatsAppQuick } from '../utils/whatsapp'
+import { useLead } from '../context/LeadContext'
+import TrackOnce from './TrackOnce'
+import { Events } from '../services/trackingService'
 
 export default function Stay() {
   const ref = useReveal()
+  const { requestBookNow, trackEvent } = useLead()
+
+  const onBook = async (item) => {
+    await trackEvent(Events.ACCOMMODATION_DETAIL_OPENED, {
+      page: '/#stay',
+      accommodation: item.name,
+      data: { id: item.id },
+    })
+    await requestBookNow({ accommodation: item.name, source: 'stay_card' })
+  }
 
   return (
     <section id="stay" className="section bg-[linear-gradient(180deg,transparent,rgb(231_235_228_/_0.55)_12%,rgb(231_235_228_/_0.55)_88%,transparent)]">
@@ -19,9 +31,14 @@ export default function Stay() {
 
         <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {accommodations.map((item) => (
-            <article
+            <TrackOnce
               key={item.id}
+              as="article"
               className="card-surface group flex flex-col"
+              event={Events.ACCOMMODATION_VIEWED}
+              page="/#stay"
+              accommodation={item.name}
+              data={{ id: item.id }}
             >
               <div className="relative overflow-hidden">
                 <img
@@ -63,12 +80,12 @@ export default function Stay() {
                 <button
                   type="button"
                   className="btn btn-whatsapp mt-5 w-full"
-                  onClick={() => openWhatsAppQuick(item.name)}
+                  onClick={() => onBook(item)}
                 >
                   Book via WhatsApp
                 </button>
               </div>
-            </article>
+            </TrackOnce>
           ))}
         </div>
       </div>
