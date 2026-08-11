@@ -43,6 +43,7 @@ export const siteConfig = {
     { label: 'Stay', href: '#stay' },
     { label: 'Experience', href: '#experience' },
     { label: 'Gallery', href: '#gallery' },
+    { label: 'Reviews', href: '#reviews' },
     { label: 'Book', href: '#booking' },
     { label: 'Location', href: '#location' },
   ],
