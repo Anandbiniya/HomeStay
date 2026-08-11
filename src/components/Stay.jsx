@@ -9,9 +9,11 @@ export default function Stay({ variant = 'full', pagePath = '/stay' }) {
   const ref = useReveal()
   const { requestBookNow, trackEvent } = useLead()
   const isPreview = variant === 'preview'
-  const items = [hostillamVeedu].filter(Boolean)
+  const item = hostillamVeedu
 
-  const onBook = (item) => {
+  if (!item) return null
+
+  const onBook = () => {
     trackEvent(Events.ACCOMMODATION_DETAIL_OPENED, {
       page: pagePath,
       accommodation: item.name,
@@ -26,81 +28,61 @@ export default function Stay({ variant = 'full', pagePath = '/stay' }) {
       className="section bg-[linear-gradient(180deg,transparent,rgb(231_235_228_/_0.55)_12%,rgb(231_235_228_/_0.55)_88%,transparent)]"
     >
       <div ref={ref} className="container-site reveal">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-2xl">
-            <p className="section-label">Stay</p>
-            <h2 className="section-title">Hostillam Veedu — a home in the hills</h2>
-            <p className="section-lead">
-              Our earth-toned cottage stay in Kodaikanal — warm rooms, shared living spaces, and the comfort
-              of a true local home.
-            </p>
-          </div>
-          {isPreview ? <SectionCta to="/stay">Explore Stay</SectionCta> : null}
-        </div>
-
-        <div
-          className={`mt-10 grid gap-6 ${
-            items.length > 1 ? 'md:grid-cols-2 xl:grid-cols-3' : 'max-w-xl md:grid-cols-1'
-          }`}
+        <TrackOnce
+          as="div"
+          event={Events.ACCOMMODATION_VIEWED}
+          page={pagePath}
+          accommodation={item.name}
+          data={{ id: item.id }}
         >
-          {items.map((item) => (
-            <TrackOnce
-              key={item.id}
-              as="article"
-              className="card-surface group flex flex-col"
-              event={Events.ACCOMMODATION_VIEWED}
-              page={pagePath}
-              accommodation={item.name}
-              data={{ id: item.id }}
-            >
-              <div className="relative overflow-hidden">
+          <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
+            <div className="relative">
+              <div className="overflow-hidden rounded-[1.6rem] shadow-[var(--shadow-soft)]">
                 <img
                   src={item.image}
                   alt={item.name}
-                  className="aspect-[4/3] w-full object-cover transition duration-700 group-hover:scale-[1.04]"
+                  className="aspect-[4/5] w-full object-cover sm:aspect-[5/4] lg:aspect-[4/5]"
                 />
-                <span className="absolute left-4 top-4 rounded-lg bg-white/92 px-3 py-1 text-xs font-bold uppercase tracking-[0.08em] text-pine">
-                  {item.type}
-                </span>
+              </div>
+              <span className="absolute left-5 top-5 rounded-lg bg-white/92 px-3 py-1 text-xs font-bold uppercase tracking-[0.08em] text-pine">
+                {item.type}
+              </span>
+            </div>
+
+            <div>
+              <p className="section-label">Stay</p>
+              <h2 className="section-title">{item.name}</h2>
+              <p className="section-lead">{item.description}</p>
+
+              <ul className="mt-6 space-y-2.5 text-[1.02rem] text-ink/85">
+                {item.features.map((feature) => (
+                  <li key={feature} className="flex items-start gap-3">
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-amber" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-8 flex flex-wrap items-end justify-between gap-4 border-t border-pine/10 pt-5">
+                <div>
+                  <p className="text-sm text-muted">Capacity</p>
+                  <p className="mt-1 font-semibold text-pine">{item.capacity}</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-display text-3xl text-pine-deep">{item.price}</p>
+                  <p className="text-sm text-muted">{item.priceNote}</p>
+                </div>
               </div>
 
-              <div className="flex flex-1 flex-col p-5 sm:p-6">
-                <div className="flex items-start justify-between gap-3">
-                  <h3 className="font-display text-[1.7rem] leading-tight text-pine-deep">{item.name}</h3>
-                </div>
-                <p className="mt-3 text-[0.98rem] leading-relaxed text-muted">{item.description}</p>
-
-                <ul className="mt-4 space-y-1.5 text-sm text-ink/80">
-                  {item.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="mt-5 flex items-end justify-between gap-3 border-t border-pine/8 pt-4">
-                  <div>
-                    <p className="text-sm text-muted">Capacity</p>
-                    <p className="font-semibold text-pine">{item.capacity}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-display text-2xl text-pine-deep">{item.price}</p>
-                    <p className="text-xs text-muted">{item.priceNote}</p>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  className="btn btn-whatsapp mt-5 w-full"
-                  onClick={() => onBook(item)}
-                >
+              <div className="mt-7 flex flex-wrap gap-3">
+                <button type="button" className="btn btn-whatsapp" onClick={onBook}>
                   Book via WhatsApp
                 </button>
+                {isPreview ? <SectionCta to="/stay">Explore Stay</SectionCta> : null}
               </div>
-            </TrackOnce>
-          ))}
-        </div>
+            </div>
+          </div>
+        </TrackOnce>
       </div>
     </section>
   )
