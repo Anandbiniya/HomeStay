@@ -83,7 +83,7 @@ export const hostillamVeedu = accommodations.find((item) => item.id === 'veedu')
 const starlitTent = accommodations.find((item) => item.id === 'tent')
 
 /**
- * My Magic Place camping offerings.
+ * My Magik Place camping offerings.
  * Tent Stay reuses existing Starlit Tent Stay data (price/features/capacity).
  * Day Camping and Make Your Own Pitch Tent are configurable — prices left unset
  * until the host confirms them (do not invent).
@@ -94,9 +94,9 @@ export const campingOptions = [
     slug: 'day-camping',
     name: 'Day Camping',
     type: 'Camping',
-    siteLabel: 'My Magic Place',
+    siteLabel: 'My Magik Place',
     description:
-      'Spend a day at the Hostillam / My Magic Place campsite — riverside nature, outdoor space, and the rhythm of camp life without an overnight stay.',
+      'Spend a day at the Hostillam / My Magik Place campsite — riverside nature, outdoor space, and the rhythm of camp life without an overnight stay.',
     capacity: null,
     capacityValue: null,
     price: null,
@@ -111,7 +111,7 @@ export const campingOptions = [
     slug: 'tent-stay',
     name: 'Tent Stay',
     type: 'Camping',
-    siteLabel: 'My Magic Place',
+    siteLabel: 'My Magik Place',
     description: starlitTent.description,
     capacity: starlitTent.capacity,
     capacityValue: starlitTent.capacityValue,
@@ -128,9 +128,9 @@ export const campingOptions = [
     slug: 'make-your-own-pitch-tent',
     name: 'Make Your Own Pitch Tent',
     type: 'Camping',
-    siteLabel: 'My Magic Place',
+    siteLabel: 'My Magik Place',
     description:
-      'Bring your own tent and pitch at the My Magic Place campsite — a flexible camping option for travellers who want to stay closer to nature on their own setup.',
+      'Bring your own tent and pitch at the My Magik Place campsite — a flexible camping option for travellers who want to stay closer to nature on their own setup.',
     capacity: null,
     capacityValue: null,
     price: null,

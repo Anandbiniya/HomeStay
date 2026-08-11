@@ -12,6 +12,17 @@ export const googleReviewsMeta = {
     'https://www.google.com/travel/search?ts=CAEaKwopEicyJTB4M2IwNzY3ZDkyMTEyZTQ1NzoweDk0YjY1ZTljNGUzZjRiM2Y&qs=CAEyFENnc0l2NWI5OGNUVGw5dVVBUkFCOAI&utm_campaign=sharing&utm_medium=link_btn&utm_source=htls',
 }
 
+/**
+ * Official My Magik Place / Hostillam campsite Google Maps listing.
+ * Used on the Camping page — keep separate from Hostillam Veedu review links.
+ */
+export const myMagikPlaceGoogleReviews = {
+  label: 'My Magik Place — Reviews',
+  lead: 'See what guests say about My Magik Place',
+  sourceLabel: 'Google Maps',
+  sourceUrl: 'https://maps.app.goo.gl/9GrQzrAd2ERp9NuJ9',
+}
+
 export const googleReviews = [
   {
     id: 'mujahid-bin-fr',

@@ -34,7 +34,7 @@ export default function Reviews({
 
   const isPreview = variant === 'preview'
   const defaultLead = context === 'camping'
-    ? 'Guest words about the Hostillam / My Magic Place camping experience.'
+    ? 'Guest words about the Hostillam / My Magik Place camping experience.'
     : context === 'stay'
       ? 'Guest words about staying at Hostillam Veedu and the Hostillam home.'
       : 'A few recent Google reviews from travellers who stayed at Hostillam. This set refreshes each month.'

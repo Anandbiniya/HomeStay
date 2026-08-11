@@ -1,6 +1,6 @@
 /**
- * Instagram settings for Hostillam and My Magic Place.
- * Reels are loaded automatically via the backend API.
+ * Instagram settings for Hostillam and My Magik Place.
+ * Reels are loaded automatically via the backend API where reliable.
  */
 
 export const instagramConfig = {
@@ -14,13 +14,18 @@ export const instagramConfig = {
   refreshIntervalMs: 15 * 60 * 1000,
 }
 
-/** My Magic Place camping Instagram — used on the Camping page. */
-export const myMagicPlaceInstagram = {
+/**
+ * Official My Magik Place Instagram — camping social proof.
+ * Do not invent reel URLs; direct visitors to the official profile.
+ */
+export const myMagikPlaceInstagram = {
   handle: 'mymagikplace',
   profileUrl: 'https://www.instagram.com/mymagikplace/',
-  title: 'See My Magic Place',
-  lead: 'Reels from @mymagikplace — the Hostillam camping experience.',
-  visibleCount: 6,
+  title: 'My Magik Place — Reels',
+  lead: 'Watch the latest camping reels from the official My Magik Place Instagram.',
 }
+
+/** @deprecated Use myMagikPlaceInstagram */
+export const myMagicPlaceInstagram = myMagikPlaceInstagram
 
 export default instagramConfig
