@@ -4,6 +4,7 @@ import About from '../components/About'
 import Stay from '../components/Stay'
 import Experience from '../components/Experience'
 import Gallery from '../components/Gallery'
+import InstagramReels from '../components/InstagramReels'
 import Reviews from '../components/Reviews'
 import Booking from '../components/Booking'
 import Location from '../components/Location'
@@ -19,6 +20,7 @@ export default function HomePage() {
         <Stay />
         <Experience />
         <Gallery />
+        <InstagramReels />
         <Reviews />
         <Booking />
         <Location />
@@ -27,4 +29,5 @@ export default function HomePage() {
     </>
   )
 }
+
 
