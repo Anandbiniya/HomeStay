@@ -1,4 +1,4 @@
-import { accommodations } from '../data/content'
+import { hostillamVeedu } from '../data/content'
 import { useReveal } from '../hooks/useReveal'
 import { useLead } from '../context/LeadContext'
 import TrackOnce from './TrackOnce'
@@ -9,6 +9,7 @@ export default function Stay({ variant = 'full', pagePath = '/stay' }) {
   const ref = useReveal()
   const { requestBookNow, trackEvent } = useLead()
   const isPreview = variant === 'preview'
+  const items = [hostillamVeedu].filter(Boolean)
 
   const onBook = (item) => {
     trackEvent(Events.ACCOMMODATION_DETAIL_OPENED, {
@@ -28,17 +29,21 @@ export default function Stay({ variant = 'full', pagePath = '/stay' }) {
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <p className="section-label">Stay</p>
-            <h2 className="section-title">Accommodation made for rest and connection</h2>
+            <h2 className="section-title">Hostillam Veedu — a home in the hills</h2>
             <p className="section-lead">
-              Choose a cozy cottage stay, a private garden room, or a starlit tent — each designed for comfort
-              in the middle of nature.
+              Our earth-toned cottage stay in Kodaikanal — warm rooms, shared living spaces, and the comfort
+              of a true local home.
             </p>
           </div>
           {isPreview ? <SectionCta to="/stay">Explore Stay</SectionCta> : null}
         </div>
 
-        <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {accommodations.map((item) => (
+        <div
+          className={`mt-10 grid gap-6 ${
+            items.length > 1 ? 'md:grid-cols-2 xl:grid-cols-3' : 'max-w-xl md:grid-cols-1'
+          }`}
+        >
+          {items.map((item) => (
             <TrackOnce
               key={item.id}
               as="article"
