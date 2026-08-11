@@ -122,7 +122,7 @@ export default function Location() {
                   className="btn btn-outline"
                   onClick={onMaps}
                 >
-                  Open in Maps
+                  Get Directions
                 </a>
                 <button
                   type="button"

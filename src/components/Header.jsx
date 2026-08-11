@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { useLead } from '../context/LeadContext'
 import { siteConfig } from '../config/site'
 
@@ -6,6 +7,8 @@ export default function Header() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const { requestBookNow } = useLead()
+  const location = useLocation()
+  const isHome = location.pathname === '/'
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -21,6 +24,10 @@ export default function Header() {
     }
   }, [open])
 
+  useEffect(() => {
+    setOpen(false)
+  }, [location.pathname])
+
   const close = () => setOpen(false)
 
   const onBookNow = (event) => {
@@ -29,36 +36,38 @@ export default function Header() {
     requestBookNow({ source: 'header' })
   }
 
+  const solid = scrolled || open || !isHome
+
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-        scrolled || open
+        solid
           ? 'bg-[rgb(246_248_246_/_0.92)] shadow-[0_10px_30px_-24px_rgb(21_32_28_/_0.45)] backdrop-blur-md'
           : 'bg-transparent'
       }`}
     >
       <div className="container-site flex h-[4.25rem] items-center justify-between gap-4 md:h-[4.75rem]">
-        <a
-          href="/"
-          className={`font-display text-[1.45rem] font-semibold tracking-[-0.02em] transition-colors ${
-            scrolled || open ? 'text-pine-deep' : 'text-white'
+        <Link
+          to="/"
+          className={`font-display text-[1.35rem] font-semibold tracking-[0.06em] transition-colors sm:text-[1.45rem] ${
+            solid ? 'text-pine-deep' : 'text-white'
           }`}
           onClick={close}
         >
-          {siteConfig.name}
-        </a>
+          {siteConfig.brand}
+        </Link>
 
         <nav className="hidden items-center gap-7 lg:flex">
-          {siteConfig.nav.map((item) => (
-            <a
+          {siteConfig.primaryNav.map((item) => (
+            <Link
               key={item.href}
-              href={item.href}
+              to={item.href}
               className={`text-[0.92rem] font-semibold transition-colors ${
-                scrolled ? 'text-ink/80 hover:text-pine' : 'text-white/90 hover:text-white'
-              }`}
+                solid ? 'text-ink/80 hover:text-pine' : 'text-white/90 hover:text-white'
+              } ${location.pathname === item.href ? (solid ? 'text-pine' : 'text-white') : ''}`}
             >
               {item.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -71,7 +80,7 @@ export default function Header() {
         <button
           type="button"
           className={`inline-flex h-11 w-11 items-center justify-center rounded-xl border lg:hidden ${
-            scrolled || open
+            solid
               ? 'border-pine/15 bg-white text-pine'
               : 'border-white/35 bg-white/10 text-white'
           }`}
@@ -102,15 +111,15 @@ export default function Header() {
 
       <div className={`border-t border-pine/10 bg-mist-soft lg:hidden ${open ? 'block' : 'hidden'}`}>
         <nav className="container-site flex flex-col gap-1 py-4">
-          {siteConfig.nav.map((item) => (
-            <a
+          {siteConfig.primaryNav.map((item) => (
+            <Link
               key={item.href}
-              href={item.href}
+              to={item.href}
               onClick={close}
               className="rounded-xl px-3 py-3 text-base font-semibold text-pine-deep hover:bg-white"
             >
               {item.label}
-            </a>
+            </Link>
           ))}
           <button type="button" onClick={onBookNow} className="btn btn-primary mt-2 w-full">
             Book Now

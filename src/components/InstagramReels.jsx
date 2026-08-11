@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useReveal } from '../hooks/useReveal'
 import { instagramConfig } from '../data/instagram'
+import SectionCta from './SectionCta'
 
 const API_BASE = import.meta.env.VITE_API_BASE || '/api'
 
@@ -13,7 +14,12 @@ async function fetchReelsFeed() {
   return data
 }
 
-export default function InstagramReels() {
+export default function InstagramReels({
+  variant = 'full',
+  limit,
+  title = instagramConfig.title,
+  lead = instagramConfig.lead,
+}) {
   const ref = useReveal()
   const sectionRef = useRef(null)
   const videoRefs = useRef(new Map())
@@ -22,6 +28,10 @@ export default function InstagramReels() {
   const [loading, setLoading] = useState(true)
   const [activeIndex, setActiveIndex] = useState(0)
   const [sectionVisible, setSectionVisible] = useState(false)
+
+  const isPreview = variant === 'preview'
+  const visibleLimit =
+    typeof limit === 'number' ? limit : isPreview ? 3 : instagramConfig.visibleCount
 
   useEffect(() => {
     let cancelled = false
@@ -49,7 +59,7 @@ export default function InstagramReels() {
     }
   }, [])
 
-  const reels = (feed?.reels || []).slice(0, instagramConfig.visibleCount)
+  const reels = (feed?.reels || []).slice(0, visibleLimit)
   const profileUrl = feed?.profileUrl || instagramConfig.profileUrl
   const handle = feed?.username || instagramConfig.handle
 
@@ -108,19 +118,22 @@ export default function InstagramReels() {
       <div ref={ref} className="container-site reveal">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
-            <p className="section-label">Instagram</p>
-            <h2 className="section-title">{instagramConfig.title}</h2>
-            <p className="section-lead">{instagramConfig.lead}</p>
+            <p className="section-label">From Hostillam</p>
+            <h2 className="section-title">{title}</h2>
+            <p className="section-lead">{lead}</p>
           </div>
 
-          <a href={profileUrl} target="_blank" rel="noreferrer" className="btn btn-outline">
-            @{handle}
-          </a>
+          <div className="flex flex-wrap gap-3">
+            {isPreview ? <SectionCta to="/reels">Watch all reels</SectionCta> : null}
+            <a href={profileUrl} target="_blank" rel="noreferrer" className="btn btn-outline">
+              @{handle}
+            </a>
+          </div>
         </div>
 
         {loading ? (
           <div className="mt-10 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-            {Array.from({ length: 3 }).map((_, index) => (
+            {Array.from({ length: Math.min(3, visibleLimit) }).map((_, index) => (
               <div key={index} className="card-surface aspect-[9/14] animate-pulse bg-white/70" />
             ))}
           </div>
@@ -203,6 +216,7 @@ export default function InstagramReels() {
             </div>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
+              {isPreview ? <SectionCta to="/reels">View all reels</SectionCta> : null}
               <a
                 href={`${profileUrl}reels/`}
                 target="_blank"

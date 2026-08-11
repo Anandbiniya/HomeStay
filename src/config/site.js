@@ -5,6 +5,8 @@
 
 export const siteConfig = {
   name: 'Hostillam',
+  /** Primary brand mark — use uppercase in main branding. */
+  brand: 'HOSTILLAM',
   tagline: 'Hosting Beautiful Minds',
   description:
     'Experience soulful stays and serene camping amidst nature, in the warmth of a home that welcomes everyone.',
@@ -38,17 +40,37 @@ export const siteConfig = {
     facebook: '',
   },
 
-  nav: [
-    { label: 'About', href: '/#about' },
-    { label: 'Stay', href: '/#stay' },
-    { label: 'Experience', href: '/#experience' },
-    { label: 'Gallery', href: '/#gallery' },
-    { label: 'Reels', href: '/#reels' },
-    { label: 'Reviews', href: '/#reviews' },
+  /** Minimal primary navbar destinations. */
+  primaryNav: [
+    { label: 'Stay', href: '/stay' },
+    { label: 'Experience', href: '/experience' },
     { label: 'Volunteer', href: '/volunteer' },
-    { label: 'Book', href: '/#booking' },
-    { label: 'Location', href: '/#location' },
+    { label: 'About', href: '/about' },
   ],
+
+  /** Footer Explore column. */
+  footerExplore: [
+    { label: 'Stay', href: '/stay' },
+    { label: 'Experience', href: '/experience' },
+    { label: 'Volunteer', href: '/volunteer' },
+    { label: 'About', href: '/about' },
+  ],
+
+  /** Footer Discover column — secondary but still fully accessible. */
+  footerDiscover: [
+    { label: 'Gallery', href: '/gallery' },
+    { label: 'Reels', href: '/reels' },
+    { label: 'Reviews', href: '/reviews' },
+    { label: 'Location', href: '/location' },
+  ],
+
+  /**
+   * @deprecated Prefer primaryNav / footerExplore / footerDiscover.
+   * Kept as a combined list for any leftover consumers.
+   */
+  get nav() {
+    return [...this.primaryNav, ...this.footerDiscover]
+  },
 }
 
 export default siteConfig

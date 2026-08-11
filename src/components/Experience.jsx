@@ -1,26 +1,33 @@
 import { experiences } from '../data/content'
 import { useReveal } from '../hooks/useReveal'
+import SectionCta from './SectionCta'
 
-export default function Experience() {
+export default function Experience({ variant = 'full', limit }) {
   const ref = useReveal()
+  const isPreview = variant === 'preview'
+  const items =
+    typeof limit === 'number' ? experiences.slice(0, limit) : isPreview ? experiences.slice(0, 4) : experiences
 
   return (
     <section id="experience" className="section">
       <div ref={ref} className="container-site reveal">
-        <div className="max-w-2xl">
-          <p className="section-label">Experience</p>
-          <h2 className="section-title">Moments that stay with you</h2>
-          <p className="section-lead">
-            From quiet mornings to campfire evenings — Hostillam is made of small, memorable experiences.
-          </p>
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl">
+            <p className="section-label">Experience</p>
+            <h2 className="section-title">Moments that stay with you</h2>
+            <p className="section-lead">
+              From quiet mornings to campfire evenings — Hostillam is made of small, memorable experiences.
+            </p>
+          </div>
+          {isPreview ? <SectionCta to="/experience">Explore Experience</SectionCta> : null}
         </div>
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {experiences.map((item, index) => (
+          {items.map((item, index) => (
             <article
               key={item.id}
               className={`group relative overflow-hidden rounded-[1.35rem] ${
-                index === 0 || index === 3 ? 'sm:col-span-2 lg:col-span-1 xl:col-span-2' : ''
+                !isPreview && (index === 0 || index === 3) ? 'sm:col-span-2 lg:col-span-1 xl:col-span-2' : ''
               } ${index === 0 ? 'min-h-[22rem]' : 'min-h-[18rem]'}`}
             >
               <img

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import heroImage from '../assets/images/hero.jpg'
 import { siteConfig } from '../config/site'
 import { useLead } from '../context/LeadContext'
@@ -22,8 +23,8 @@ export default function Hero() {
           <p className="mb-4 text-[0.8rem] font-semibold uppercase tracking-[0.22em] text-white/80">
             {siteConfig.tagline}
           </p>
-          <h1 className="font-display text-[clamp(3.1rem,9vw,5.6rem)] font-semibold leading-[0.95] tracking-[-0.03em]">
-            {siteConfig.name}
+          <h1 className="font-display text-[clamp(3.1rem,9vw,5.6rem)] font-semibold leading-[0.95] tracking-[0.04em]">
+            {siteConfig.brand}
           </h1>
           <p className="mt-5 max-w-xl text-[1.08rem] leading-relaxed text-white/88 md:text-[1.18rem]">
             Soulful stays and serene camping in the hills of Kodaikanal — a warm home for beautiful minds.
@@ -34,11 +35,11 @@ export default function Hero() {
               className="btn btn-primary"
               onClick={() => requestBookNow({ source: 'hero' })}
             >
-              Book via WhatsApp
+              Book Now
             </button>
-            <a href="/#stay" className="btn btn-secondary">
+            <Link to="/stay" className="btn btn-secondary">
               Explore Stay
-            </a>
+            </Link>
           </div>
           <p className="mt-6 text-sm text-white/70">{siteConfig.location.short}</p>
         </div>

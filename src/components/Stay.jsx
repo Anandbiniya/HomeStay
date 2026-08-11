@@ -3,14 +3,16 @@ import { useReveal } from '../hooks/useReveal'
 import { useLead } from '../context/LeadContext'
 import TrackOnce from './TrackOnce'
 import { Events } from '../services/trackingService'
+import SectionCta from './SectionCta'
 
-export default function Stay() {
+export default function Stay({ variant = 'full', pagePath = '/stay' }) {
   const ref = useReveal()
   const { requestBookNow, trackEvent } = useLead()
+  const isPreview = variant === 'preview'
 
   const onBook = (item) => {
     trackEvent(Events.ACCOMMODATION_DETAIL_OPENED, {
-      page: '/#stay',
+      page: pagePath,
       accommodation: item.name,
       data: { id: item.id },
     })
@@ -18,15 +20,21 @@ export default function Stay() {
   }
 
   return (
-    <section id="stay" className="section bg-[linear-gradient(180deg,transparent,rgb(231_235_228_/_0.55)_12%,rgb(231_235_228_/_0.55)_88%,transparent)]">
+    <section
+      id="stay"
+      className="section bg-[linear-gradient(180deg,transparent,rgb(231_235_228_/_0.55)_12%,rgb(231_235_228_/_0.55)_88%,transparent)]"
+    >
       <div ref={ref} className="container-site reveal">
-        <div className="max-w-2xl">
-          <p className="section-label">Stay</p>
-          <h2 className="section-title">Accommodation made for rest and connection</h2>
-          <p className="section-lead">
-            Choose a cozy cottage stay, a private garden room, or a starlit tent — each designed for comfort
-            in the middle of nature.
-          </p>
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl">
+            <p className="section-label">Stay</p>
+            <h2 className="section-title">Accommodation made for rest and connection</h2>
+            <p className="section-lead">
+              Choose a cozy cottage stay, a private garden room, or a starlit tent — each designed for comfort
+              in the middle of nature.
+            </p>
+          </div>
+          {isPreview ? <SectionCta to="/stay">Explore Stay</SectionCta> : null}
         </div>
 
         <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -36,7 +44,7 @@ export default function Stay() {
               as="article"
               className="card-surface group flex flex-col"
               event={Events.ACCOMMODATION_VIEWED}
-              page="/#stay"
+              page={pagePath}
               accommodation={item.name}
               data={{ id: item.id }}
             >

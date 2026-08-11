@@ -3,13 +3,28 @@ import { useReveal } from '../hooks/useReveal'
 import {
   getMonthlyGoogleReviews,
   getReviewsMonthLabel,
+  googleReviews,
   googleReviewsMeta,
 } from '../data/reviews'
+import SectionCta from './SectionCta'
 
-export default function Reviews() {
+/**
+ * @param {'preview' | 'monthly' | 'all'} variant
+ * preview: highlighted subset for home/stay
+ * monthly: month-rotated set (previous default behaviour)
+ * all: complete curated Google review pool
+ */
+export default function Reviews({ variant = 'monthly', limit }) {
   const ref = useReveal()
-  const reviews = useMemo(() => getMonthlyGoogleReviews(), [])
   const monthLabel = useMemo(() => getReviewsMonthLabel(), [])
+
+  const reviews = useMemo(() => {
+    if (variant === 'all') return googleReviews
+    const count = typeof limit === 'number' ? limit : variant === 'preview' ? 3 : 5
+    return getMonthlyGoogleReviews(new Date(), count)
+  }, [variant, limit])
+
+  const isPreview = variant === 'preview'
 
   return (
     <section id="reviews" className="section">
@@ -19,8 +34,9 @@ export default function Reviews() {
             <p className="section-label">Reviews</p>
             <h2 className="section-title">What guests say on Google</h2>
             <p className="section-lead">
-              A few recent Google reviews from travellers who stayed at Hostillam. This set refreshes
-              each month.
+              {variant === 'all'
+                ? 'Every curated Google review we feature on Hostillam — real words from travellers who stayed with us.'
+                : 'A few recent Google reviews from travellers who stayed at Hostillam. This set refreshes each month.'}
             </p>
           </div>
 
@@ -36,18 +52,25 @@ export default function Reviews() {
             <p className="mt-1 text-sm text-muted">
               Based on {googleReviewsMeta.totalCount}+ Google reviews
             </p>
-            <p className="mt-1 text-xs text-muted">Showing reviews for {monthLabel}</p>
+            {variant !== 'all' ? (
+              <p className="mt-1 text-xs text-muted">Showing reviews for {monthLabel}</p>
+            ) : (
+              <p className="mt-1 text-xs text-muted">Showing all featured Google reviews</p>
+            )}
           </div>
         </div>
 
         <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {reviews.map((review) => (
             <article
-              key={`${monthLabel}-${review.id}`}
+              key={`${variant}-${monthLabel}-${review.id}`}
               className="card-surface flex h-full flex-col p-5 sm:p-6"
             >
               <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-1 text-amber" aria-label={`${review.rating} out of 5 stars`}>
+                <div
+                  className="flex items-center gap-1 text-amber"
+                  aria-label={`${review.rating} out of 5 stars`}
+                >
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star key={i} filled={i < review.rating} />
                   ))}
@@ -70,6 +93,7 @@ export default function Reviews() {
         </div>
 
         <div className="mt-8 flex flex-wrap items-center gap-3">
+          {isPreview ? <SectionCta to="/reviews">See all reviews</SectionCta> : null}
           <a
             href={googleReviewsMeta.sourceUrl}
             target="_blank"
@@ -79,7 +103,9 @@ export default function Reviews() {
             See all Google reviews
           </a>
           <p className="text-sm text-muted">
-            Reviews shown here rotate monthly from Hostillam’s Google reviews.
+            {variant === 'all'
+              ? 'These are Hostillam’s featured Google reviews. More live on Google.'
+              : 'Reviews shown here rotate monthly from Hostillam’s Google reviews.'}
           </p>
         </div>
       </div>
