@@ -7,6 +7,36 @@ import { getWhatsAppUrl } from '../utils/whatsapp'
 
 const LeadContext = createContext(null)
 
+function scrollToBookingSection() {
+  document.body.style.overflow = ''
+  const target = document.getElementById('booking')
+  if (!target) return false
+
+  // Make sure reveal animation is not leaving the section visually unset.
+  target.querySelectorAll('.reveal').forEach((node) => node.classList.add('is-visible'))
+  target.classList.add('is-visible')
+
+  const headerOffset = 88
+  const top = target.getBoundingClientRect().top + window.pageYOffset - headerOffset
+  window.scrollTo(0, Math.max(0, top))
+
+  if (window.location.hash !== '#booking') {
+    window.history.replaceState(null, '', '#booking')
+  }
+  return true
+}
+
+function ensureBookingInView(attempt = 0) {
+  scrollToBookingSection()
+  const target = document.getElementById('booking')
+  if (!target) return
+  const top = target.getBoundingClientRect().top
+  // Keep correcting while images above finish loading and push the section down.
+  if ((top < 40 || top > 160) && attempt < 12) {
+    window.setTimeout(() => ensureBookingInView(attempt + 1), 80)
+  }
+}
+
 export function LeadProvider({ children }) {
   const [contact, setContact] = useState(() => getStoredLeadContact())
   const [modalOpen, setModalOpen] = useState(false)
@@ -29,7 +59,6 @@ export function LeadProvider({ children }) {
   }, [])
 
   const closeModal = useCallback((result = null) => {
-    // Unlock scroll immediately so follow-up navigation is not blocked.
     document.body.style.overflow = ''
     setModalOpen(false)
     const resolve = resolverRef.current
@@ -59,6 +88,22 @@ export function LeadProvider({ children }) {
     [],
   )
 
+  const openBooking = useCallback((prefill = {}) => {
+    setBookingPrefill({
+      accommodation: prefill.accommodation || '',
+      guests: prefill.guests || '2',
+      ...prefill,
+      nonce: Date.now(),
+    })
+    trackEvent(Events.BOOKING_FORM_OPENED, {
+      page: '/#booking',
+      accommodation: prefill.accommodation || null,
+    })
+
+    scrollToBookingSection()
+    ensureBookingInView(0)
+  }, [])
+
   const handleLeadSubmit = useCallback(
     async ({ name, phone, email }) => {
       const nextContact = {
@@ -69,12 +114,24 @@ export function LeadProvider({ children }) {
         capturedAt: new Date().toISOString(),
       }
 
-      // Instant local save + close so Book Now continues without waiting on the network.
       storeLeadContact(nextContact)
       setContact(nextContact)
-      closeModal(nextContact)
+      document.body.style.overflow = ''
+      setModalOpen(false)
 
-      // Host notification + tracking happen in the background.
+      const shouldOpenBooking =
+        modalMeta.intent === 'BOOKING_ENQUIRY' ||
+        modalMeta.sourceEvent === Events.BOOK_NOW_CLICKED ||
+        modalMeta.sourceEvent === Events.BOOKING_FORM_SUBMITTED
+
+      const resolve = resolverRef.current
+      resolverRef.current = null
+      if (resolve) resolve(nextContact)
+
+      if (shouldOpenBooking) {
+        openBooking({ accommodation: modalMeta.accommodation || '' })
+      }
+
       notifyHostFromLeadCapture({
         name,
         phone,
@@ -105,41 +162,11 @@ export function LeadProvider({ children }) {
 
       return nextContact
     },
-    [closeModal, modalMeta],
+    [modalMeta, openBooking],
   )
-
-  const openBooking = useCallback((prefill = {}) => {
-    setBookingPrefill({
-      accommodation: prefill.accommodation || '',
-      guests: prefill.guests || '2',
-      ...prefill,
-      nonce: Date.now(),
-    })
-    trackEvent(Events.BOOKING_FORM_OPENED, {
-      page: '/#booking',
-      accommodation: prefill.accommodation || null,
-    })
-
-    const scrollToBooking = () => {
-      document.body.style.overflow = ''
-      const target = document.getElementById('booking')
-      if (!target) return
-      target.scrollIntoView({ behavior: 'auto', block: 'start' })
-      // Offset for sticky header.
-      window.scrollBy({ top: -88, left: 0, behavior: 'auto' })
-      if (window.location.hash !== '#booking') {
-        window.history.replaceState(null, '', '#booking')
-      }
-    }
-
-    // Jump now, then once more after layout/images settle.
-    window.setTimeout(scrollToBooking, 0)
-    window.setTimeout(scrollToBooking, 120)
-  }, [])
 
   const requestBookNow = useCallback(
     ({ accommodation, source = 'book_now' } = {}) => {
-      // Never block the button on analytics.
       trackEvent(Events.BOOK_NOW_CLICKED, {
         page: '/#booking',
         accommodation: accommodation || null,
@@ -162,8 +189,11 @@ export function LeadProvider({ children }) {
         intent: 'BOOKING_ENQUIRY',
         title: 'Before we connect you with the host',
       }).then((lead) => {
+        // Booking open is handled in handleLeadSubmit for the first-time path.
         if (!lead) return null
-        openBooking({ accommodation: accommodation || '' })
+        if (getStoredLeadContact()?.phone) {
+          openBooking({ accommodation: accommodation || '' })
+        }
         return lead
       })
     },
