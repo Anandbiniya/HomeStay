@@ -124,16 +124,17 @@ export function LeadProvider({ children }) {
       document.body.style.overflow = ''
       const target = document.getElementById('booking')
       if (!target) return
-      const headerOffset = 88
-      const top = target.getBoundingClientRect().top + window.scrollY - headerOffset
+      target.scrollIntoView({ behavior: 'auto', block: 'start' })
+      // Offset for sticky header.
+      window.scrollBy({ top: -88, left: 0, behavior: 'auto' })
       if (window.location.hash !== '#booking') {
         window.history.replaceState(null, '', '#booking')
       }
-      window.scrollTo({ top: Math.max(0, top), behavior: 'auto' })
     }
 
-    // Allow React to close the modal, then jump instantly.
+    // Jump now, then once more after layout/images settle.
     window.setTimeout(scrollToBooking, 0)
+    window.setTimeout(scrollToBooking, 120)
   }, [])
 
   const requestBookNow = useCallback(
