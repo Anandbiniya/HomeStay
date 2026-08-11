@@ -65,8 +65,8 @@ export default function InstagramReels({
   }, [feedUsername])
 
   const reels = (feed?.reels || []).slice(0, visibleLimit)
-  const profileUrl = feed?.profileUrl || instagramConfig.profileUrl
-  const handle = feed?.username || instagramConfig.handle
+  const profileUrl = feed?.profileUrl || `https://www.instagram.com/${feedUsername}/`
+  const handle = feed?.username || feedUsername
 
   useEffect(() => {
     const node = sectionRef.current
@@ -132,7 +132,7 @@ export default function InstagramReels({
             {isPreview ? (
               viewAllTo.startsWith('http') ? (
                 <a href={viewAllTo} target="_blank" rel="noreferrer" className="btn btn-outline">
-                  Watch all reels
+                  View on Instagram
                 </a>
               ) : (
                 <SectionCta to={viewAllTo}>Watch all reels</SectionCta>
@@ -159,7 +159,7 @@ export default function InstagramReels({
               We couldn’t load the latest reels right now. You can still watch everything on Instagram.
             </p>
             <a href={profileUrl} target="_blank" rel="noreferrer" className="btn btn-primary mt-6">
-              Open @{handle}
+              View on Instagram
             </a>
           </div>
         ) : null}
@@ -232,7 +232,7 @@ export default function InstagramReels({
               {isPreview ? (
                 viewAllTo.startsWith('http') ? (
                   <a href={viewAllTo} target="_blank" rel="noreferrer" className="btn btn-outline">
-                    View all reels
+                    View on Instagram
                   </a>
                 ) : (
                   <SectionCta to={viewAllTo}>View all reels</SectionCta>

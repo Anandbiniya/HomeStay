@@ -5,26 +5,38 @@ import { backendConfig } from '../config.js'
 const DEFAULT_USERNAME = 'host.illam'
 const CACHE_TTL_MS = 30 * 60 * 1000 // normal refresh window
 const STALE_TTL_MS = 24 * 60 * 60 * 1000 // keep serving stale data up to 24h on errors
-const CACHE_PATH = path.join(backendConfig.dataDir, 'instagram-cache.json')
 
-let memoryCache = {
-  fetchedAt: 0,
-  username: '',
-  payload: null,
+/** In-memory cache keyed by Instagram username. */
+const memoryCaches = new Map()
+
+function cacheFileFor(username) {
+  const safe = String(username || DEFAULT_USERNAME).replace(/[^a-zA-Z0-9._-]/g, '_')
+  return path.join(backendConfig.dataDir, `instagram-cache-${safe}.json`)
 }
 
-async function readDiskCache() {
+async function readDiskCache(username) {
   try {
-    const raw = await fs.readFile(CACHE_PATH, 'utf8')
+    const raw = await fs.readFile(cacheFileFor(username), 'utf8')
     return JSON.parse(raw)
   } catch {
+    // Fall back to legacy single-cache file for host.illam only.
+    if (username === DEFAULT_USERNAME) {
+      try {
+        const legacy = path.join(backendConfig.dataDir, 'instagram-cache.json')
+        const raw = await fs.readFile(legacy, 'utf8')
+        const parsed = JSON.parse(raw)
+        if (parsed?.username === username) return parsed
+      } catch {
+        return null
+      }
+    }
     return null
   }
 }
 
 async function writeDiskCache(entry) {
   await fs.mkdir(backendConfig.dataDir, { recursive: true })
-  await fs.writeFile(CACHE_PATH, JSON.stringify(entry, null, 2))
+  await fs.writeFile(cacheFileFor(entry.username), JSON.stringify(entry, null, 2))
 }
 
 function pickCaption(node) {
@@ -96,19 +108,15 @@ function cacheAge(entry) {
 
 export async function getInstagramReelsFeed({ username = DEFAULT_USERNAME, force = false } = {}) {
   const handle = (username || DEFAULT_USERNAME).replace(/^@/, '')
-  const disk = await readDiskCache()
+  const memoryCache = memoryCaches.get(handle)
+  const disk = await readDiskCache(handle)
 
-  if (
-    !force &&
-    memoryCache.payload &&
-    memoryCache.username === handle &&
-    cacheAge(memoryCache) < CACHE_TTL_MS
-  ) {
+  if (!force && memoryCache?.payload && cacheAge(memoryCache) < CACHE_TTL_MS) {
     return { ...memoryCache.payload, cached: true }
   }
 
   if (!force && disk?.username === handle && cacheAge(disk) < CACHE_TTL_MS && disk.payload) {
-    memoryCache = disk
+    memoryCaches.set(handle, disk)
     return { ...disk.payload, cached: true }
   }
 
@@ -119,12 +127,12 @@ export async function getInstagramReelsFeed({ username = DEFAULT_USERNAME, force
       username: handle,
       payload,
     }
-    memoryCache = entry
+    memoryCaches.set(handle, entry)
     await writeDiskCache(entry)
     return { ...payload, cached: false }
   } catch (error) {
     const fallback =
-      (memoryCache.username === handle && memoryCache.payload && memoryCache) ||
+      (memoryCache?.payload && memoryCache) ||
       (disk?.username === handle && disk.payload && disk) ||
       null
 
@@ -217,13 +225,14 @@ export async function fetchInstagramMedia(rawUrl) {
 export async function seedInstagramCacheFromRawProfile(rawJson, username = DEFAULT_USERNAME) {
   const user = rawJson?.data?.user
   if (!user) throw new Error('Invalid Instagram profile JSON')
+  const handle = (username || user.username || DEFAULT_USERNAME).replace(/^@/, '')
   const payload = buildPayloadFromProfile(user)
   const entry = {
     fetchedAtMs: Date.now(),
-    username: username.replace(/^@/, ''),
+    username: handle,
     payload,
   }
-  memoryCache = entry
+  memoryCaches.set(handle, entry)
   await writeDiskCache(entry)
   return payload
 }

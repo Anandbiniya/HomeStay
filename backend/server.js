@@ -31,8 +31,8 @@ app.get('/api/health', (_req, res) => {
 })
 
 app.get('/api/instagram/reels', async (req, res) => {
+  const username = String(req.query.username || getConfiguredInstagramUsername())
   try {
-    const username = String(req.query.username || getConfiguredInstagramUsername())
     const force = String(req.query.refresh || '') === '1'
     const feed = await getInstagramReelsFeed({ username, force })
     res.set('Cache-Control', 'public, max-age=300')
@@ -43,7 +43,7 @@ app.get('/api/instagram/reels', async (req, res) => {
     return res.status(502).json({
       error: 'Could not load Instagram reels right now',
       detail: error.message,
-      profileUrl: `https://www.instagram.com/${getConfiguredInstagramUsername()}/`,
+      profileUrl: `https://www.instagram.com/${username.replace(/^@/, '')}/`,
       reels: [],
     })
   }
