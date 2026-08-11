@@ -29,6 +29,8 @@ export function LeadProvider({ children }) {
   }, [])
 
   const closeModal = useCallback((result = null) => {
+    // Unlock scroll immediately so follow-up navigation is not blocked.
+    document.body.style.overflow = ''
     setModalOpen(false)
     const resolve = resolverRef.current
     resolverRef.current = null
@@ -119,18 +121,19 @@ export function LeadProvider({ children }) {
     })
 
     const scrollToBooking = () => {
+      document.body.style.overflow = ''
       const target = document.getElementById('booking')
       if (!target) return
       const headerOffset = 88
       const top = target.getBoundingClientRect().top + window.scrollY - headerOffset
-      window.location.hash = 'booking'
+      if (window.location.hash !== '#booking') {
+        window.history.replaceState(null, '', '#booking')
+      }
       window.scrollTo({ top: Math.max(0, top), behavior: 'auto' })
     }
 
-    // Wait one frame so the lead modal can unmount and unlock body scroll.
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(scrollToBooking)
-    })
+    // Allow React to close the modal, then jump instantly.
+    window.setTimeout(scrollToBooking, 0)
   }, [])
 
   const requestBookNow = useCallback(
