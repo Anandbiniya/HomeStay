@@ -182,33 +182,44 @@ export function LeadProvider({ children }) {
         })
       }
 
-      notifyHostFromLeadCapture({
-        name,
-        phone,
-        email,
-        accommodation: modalMeta.accommodation,
-        sourceEvent: modalMeta.sourceEvent || Events.LEAD_CAPTURED,
-        intent: modalMeta.intent || 'CONTACT',
-      })
-        .then((result) => {
-          if (!result?.lead) return
-          const synced = {
-            name: result.lead.name,
-            phone: result.lead.phone,
-            email: result.lead.email || '',
-            leadId: result.lead.id,
-            capturedAt: result.lead.updatedAt,
-          }
-          storeLeadContact(synced)
-          setContact(synced)
-          trackEvent(Events.LEAD_CAPTURED, {
-            accommodation: modalMeta.accommodation,
-            data: { leadId: result.lead.id },
+      // Only notify the host for non-booking contact intents.
+      // Booking notifications are sent exclusively after "Send Booking Request".
+      const isBookingIntent =
+        modalMeta.intent === 'BOOKING_ENQUIRY' ||
+        modalMeta.sourceEvent === Events.BOOK_NOW_CLICKED ||
+        modalMeta.sourceEvent === Events.BOOKING_FORM_SUBMITTED
+
+      if (!isBookingIntent) {
+        notifyHostFromLeadCapture({
+          name,
+          phone,
+          email,
+          accommodation: modalMeta.accommodation,
+          sourceEvent: modalMeta.sourceEvent || Events.LEAD_CAPTURED,
+          intent: modalMeta.intent || 'CONTACT',
+        })
+          .then((result) => {
+            if (!result?.lead) return
+            const synced = {
+              name: result.lead.name,
+              phone: result.lead.phone,
+              email: result.lead.email || '',
+              leadId: result.lead.id,
+              capturedAt: result.lead.updatedAt,
+            }
+            storeLeadContact(synced)
+            setContact(synced)
+            trackEvent(Events.LEAD_CAPTURED, {
+              accommodation: modalMeta.accommodation,
+              data: { leadId: result.lead.id },
+            })
           })
-        })
-        .catch((error) => {
-          console.warn('[lead] background notify failed', error.message)
-        })
+          .catch((error) => {
+            console.warn('[lead] background notify failed', error.message)
+          })
+      } else {
+        storeLeadContact(nextContact)
+      }
 
       return nextContact
     },
@@ -217,13 +228,11 @@ export function LeadProvider({ children }) {
 
   const requestBookNow = useCallback(
     ({ accommodation, source = 'book_now', returnTo } = {}) => {
+      // Book Now only opens the booking form. Nothing is sent to the host here.
       trackEvent(Events.BOOK_NOW_CLICKED, {
         page: window.location.pathname || '/#booking',
         accommodation: accommodation || null,
         data: { source },
-      })
-      trackEvent(Events.BOOKING_ENQUIRY_STARTED, {
-        accommodation: accommodation || null,
       })
 
       const prefill = {
@@ -237,28 +246,10 @@ export function LeadProvider({ children }) {
               : ''),
       }
 
-      const existing = getStoredLeadContact()
-      if (existing?.phone) {
-        setContact(existing)
-        openBooking(prefill)
-        return Promise.resolve(existing)
-      }
-
-      return ensureContact({
-        sourceEvent: Events.BOOK_NOW_CLICKED,
-        accommodation,
-        intent: 'BOOKING_ENQUIRY',
-        title: 'Before we connect you with the host',
-      }).then((lead) => {
-        // Booking open is handled in handleLeadSubmit for the first-time path.
-        if (!lead) return null
-        if (getStoredLeadContact()?.phone) {
-          openBooking(prefill)
-        }
-        return lead
-      })
+      openBooking(prefill)
+      return Promise.resolve(getStoredLeadContact())
     },
-    [ensureContact, openBooking],
+    [openBooking],
   )
 
   const requestWhatsAppContact = useCallback(

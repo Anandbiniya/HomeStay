@@ -5,8 +5,9 @@ import { notifyHostOfLead } from './notificationService.js'
 
 export const LEAD_STATUSES = [
   'NEW',
+  'REQUESTED',
   'CONTACTED',
-  'BOOKING_ENQUIRY',
+  'BOOKING_ENQUIRY', // legacy alias kept for older records
   'CONFIRMED',
   'CANCELLED',
 ]
@@ -79,6 +80,7 @@ export async function createBookingEnquiry({
   checkIn,
   checkOut,
   message,
+  status = 'REQUESTED',
   sourceEvent = 'BOOKING_ENQUIRY_COMPLETED',
 }) {
   const lead = await upsertLead({
@@ -86,7 +88,7 @@ export async function createBookingEnquiry({
     name,
     phone,
     email,
-    status: 'BOOKING_ENQUIRY',
+    status: LEAD_STATUSES.includes(status) ? status : 'REQUESTED',
     accommodation,
     intent: 'BOOKING_ENQUIRY',
     sourceEvent,
@@ -95,6 +97,7 @@ export async function createBookingEnquiry({
       checkIn,
       checkOut,
       message: message || '',
+      status: 'REQUESTED',
       submittedAt: new Date().toISOString(),
     },
   })
@@ -106,6 +109,7 @@ export async function createBookingEnquiry({
     lead,
     activity,
     action: sourceEvent,
+    kind: 'BOOKING_REQUEST',
   })
 
   await updateDb((db) => {

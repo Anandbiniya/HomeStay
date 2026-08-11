@@ -172,7 +172,7 @@ export default function StayPage() {
         options={[veedu]}
         accommodationLabel="Accommodation"
         title="Book Hostillam Veedu"
-        lead="Hostillam Veedu is already selected. Share your dates and details — we open WhatsApp so you can finish with the host."
+        lead="Hostillam Veedu is already selected. Enter your details, review the request, then send it to the host. No login required."
         returnTo="/stay"
         returnLabel="Back to Stay"
       />

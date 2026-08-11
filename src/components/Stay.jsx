@@ -75,8 +75,8 @@ export default function Stay({ variant = 'full', pagePath = '/stay' }) {
               </div>
 
               <div className="mt-7 flex flex-wrap gap-3">
-                <button type="button" className="btn btn-whatsapp" onClick={onBook}>
-                  Book via WhatsApp
+                <button type="button" className="btn btn-primary" onClick={onBook}>
+                  Book Now
                 </button>
                 {isPreview ? <SectionCta to="/stay">Explore Stay</SectionCta> : null}
               </div>

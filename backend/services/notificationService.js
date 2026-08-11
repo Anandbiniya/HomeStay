@@ -2,6 +2,43 @@ import { randomUUID } from 'crypto'
 import { backendConfig } from '../config.js'
 import { updateDb } from '../store.js'
 
+function buildBookingRequestMessage({ lead }) {
+  const booking = lead.booking || {}
+  return [
+    '🏕️ NEW HOSTILLAM BOOKING REQUEST',
+    '',
+    'Guest:',
+    lead.name || '—',
+    '',
+    'Phone:',
+    lead.phone || '—',
+    '',
+    'Email:',
+    lead.email || '—',
+    '',
+    'Booking:',
+    lead.accommodation || '—',
+    '',
+    'Guests:',
+    booking.guests != null ? String(booking.guests) : '—',
+    '',
+    'Check-in:',
+    booking.checkIn || '—',
+    '',
+    'Check-out:',
+    booking.checkOut || '—',
+    '',
+    'Message:',
+    booking.message || '—',
+    '',
+    'Source:',
+    'Hostillam Website',
+    '',
+    'Status:',
+    booking.status || lead.status || 'REQUESTED',
+  ].join('\n')
+}
+
 function buildLeadMessage({ lead, activity, action }) {
   const booking = lead.booking || {}
   const lines = [
@@ -48,6 +85,10 @@ function buildLeadMessage({ lead, activity, action }) {
   return lines.join('\n')
 }
 
+/**
+ * WhatsApp Cloud API delivery (server-side only).
+ * When credentials are missing, the message is logged — never fake a silent send.
+ */
 async function sendWhatsAppCloudApi(to, body) {
   const { accessToken, phoneNumberId, apiVersion } = backendConfig.whatsapp
   if (!accessToken || !phoneNumberId) {
@@ -93,6 +134,10 @@ async function sendWhatsAppCloudApi(to, body) {
   }
 }
 
+/**
+ * Email delivery abstraction (server-side only).
+ * Credentials never leave the backend. Without SMTP config we log only.
+ */
 async function sendEmailFallback(to, subject, body) {
   const { host, user, pass, from, port } = backendConfig.smtp
   if (!host || !user || !pass) {
@@ -104,9 +149,8 @@ async function sendEmailFallback(to, subject, body) {
     }
   }
 
-  // Lightweight SMTP via fetch-compatible providers is environment-specific.
-  // Keep a clear abstraction; when SMTP is present we log structured payload
-  // and note that a transport adapter can be plugged in.
+  // Transport adapter hook: SMTP is configured; a real nodemailer/SES transport
+  // can be plugged in here without changing the booking API contract.
   return {
     channel: 'EMAIL',
     status: 'queued',
@@ -115,8 +159,12 @@ async function sendEmailFallback(to, subject, body) {
   }
 }
 
-export async function notifyHostOfLead({ lead, activity, action }) {
-  const message = buildLeadMessage({ lead, activity, action })
+export async function notifyHostOfLead({ lead, activity, action, kind = 'LEAD' }) {
+  const message =
+    kind === 'BOOKING_REQUEST'
+      ? buildBookingRequestMessage({ lead })
+      : buildLeadMessage({ lead, activity, action })
+
   const channels = backendConfig.notificationChannels
   const results = []
 
@@ -127,11 +175,11 @@ export async function notifyHostOfLead({ lead, activity, action }) {
   }
 
   if (channels.includes('EMAIL')) {
-    const result = await sendEmailFallback(
-      backendConfig.host.email,
-      `New Hostillam lead — ${lead.name || lead.phone}`,
-      message,
-    )
+    const subject =
+      kind === 'BOOKING_REQUEST'
+        ? `New Hostillam booking request — ${lead.name || lead.phone}`
+        : `New Hostillam lead — ${lead.name || lead.phone}`
+    const result = await sendEmailFallback(backendConfig.host.email, subject, message)
     results.push(result)
     console.info('[notification:email]', result.status, result.detail)
   }
@@ -140,6 +188,7 @@ export async function notifyHostOfLead({ lead, activity, action }) {
     id: `ntf_${randomUUID()}`,
     leadId: lead.id,
     visitorId: lead.visitorId,
+    kind,
     channels: results,
     message,
     createdAt: new Date().toISOString(),
@@ -153,4 +202,4 @@ export async function notifyHostOfLead({ lead, activity, action }) {
   return notification
 }
 
-export { buildLeadMessage }
+export { buildLeadMessage, buildBookingRequestMessage }

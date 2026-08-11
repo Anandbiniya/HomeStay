@@ -2,6 +2,7 @@ import { siteConfig } from '../config/site'
 
 /**
  * Build a WhatsApp chat URL with an optional pre-filled message.
+ * Host number always comes from central siteConfig — never hard-code.
  */
 export function getWhatsAppUrl(message = '') {
   const number = siteConfig.whatsapp.number.replace(/\D/g, '')
@@ -11,11 +12,13 @@ export function getWhatsAppUrl(message = '') {
 }
 
 /**
- * Build the standard Hostillam booking enquiry message.
+ * Standard Hostillam booking request WhatsApp message.
+ * Opens in WhatsApp for the guest to press Send — the frontend cannot silently deliver.
  */
 export function buildBookingMessage({
   name,
   phone,
+  email,
   guests,
   accommodation,
   checkIn,
@@ -23,19 +26,37 @@ export function buildBookingMessage({
   message,
 }) {
   return [
+    '🏕️ HOSTILLAM BOOKING REQUEST',
+    '',
     'Hello Hostillam,',
     '',
     'I would like to enquire about a booking.',
     '',
-    `Name: ${name}`,
-    `Phone: ${phone}`,
-    `Guests: ${guests}`,
-    `Accommodation: ${accommodation}`,
-    `Check-in: ${checkIn}`,
-    `Check-out: ${checkOut}`,
-    `Message: ${message || '—'}`,
+    'Stay / Camping:',
+    accommodation || '—',
     '',
-    'Please let me know about availability and booking confirmation.',
+    'Name:',
+    name || '—',
+    '',
+    'Phone:',
+    phone || '—',
+    '',
+    'Email:',
+    email || '—',
+    '',
+    'Guests:',
+    String(guests || '—'),
+    '',
+    'Check-in:',
+    checkIn || '—',
+    '',
+    'Check-out:',
+    checkOut || '—',
+    '',
+    'Message:',
+    message?.trim() || '—',
+    '',
+    'Please confirm availability and booking.',
     '',
     'Thank you.',
   ].join('\n')
@@ -45,15 +66,18 @@ export function openWhatsAppBooking(formData) {
   const text = buildBookingMessage(formData)
   const url = getWhatsAppUrl(text)
   window.open(url, '_blank', 'noopener,noreferrer')
+  return url
 }
 
 export function openWhatsAppQuick(accommodationName) {
   const text = [
+    '🏕️ HOSTILLAM BOOKING REQUEST',
+    '',
     'Hello Hostillam,',
     '',
     `I would like to enquire about booking${accommodationName ? `: ${accommodationName}` : ''}.`,
     '',
-    'Please let me know about availability.',
+    'Please confirm availability and booking.',
     '',
     'Thank you.',
   ].join('\n')

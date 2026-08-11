@@ -161,7 +161,7 @@ export default function CampingPage() {
         options={campingOptions}
         accommodationLabel="Camping option"
         title="Book a camping experience"
-        lead="Choose Day Camping, Tent Stay, or Make Your Own Pitch Tent — or tap Book Now on a card to pre-select it."
+        lead="Choose Day Camping, Tent Stay, or Make Your Own Pitch Tent — or tap Book Now on a card to pre-select it. Review before sending."
         returnTo="/camping"
         returnLabel="Back to Camping options"
       />

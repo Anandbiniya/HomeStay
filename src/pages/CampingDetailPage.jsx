@@ -142,7 +142,7 @@ export default function CampingDetailPage() {
         options={[option]}
         accommodationLabel="Camping option"
         title={`Book ${option.name}`}
-        lead={`${option.name} is already selected. Share your details and we open WhatsApp with the host.`}
+        lead={`${option.name} is already selected. Enter your details, review the request, then send it to the host.`}
         returnTo="/camping"
         returnLabel="Back to Camping"
       />
