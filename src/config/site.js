@@ -42,18 +42,20 @@ export const siteConfig = {
 
   /** Minimal primary navbar destinations. */
   primaryNav: [
+    { label: 'About', href: '/about' },
     { label: 'Stay', href: '/stay' },
+    { label: 'Camping', href: '/camping' },
     { label: 'Experience', href: '/experience' },
     { label: 'Volunteer', href: '/volunteer' },
-    { label: 'About', href: '/about' },
   ],
 
   /** Footer Explore column. */
   footerExplore: [
+    { label: 'About', href: '/about' },
     { label: 'Stay', href: '/stay' },
+    { label: 'Camping', href: '/camping' },
     { label: 'Experience', href: '/experience' },
     { label: 'Volunteer', href: '/volunteer' },
-    { label: 'About', href: '/about' },
   ],
 
   /** Footer Discover column — secondary but still fully accessible. */

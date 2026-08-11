@@ -64,7 +64,13 @@ export default function Header() {
               to={item.href}
               className={`text-[0.92rem] font-semibold transition-colors ${
                 solid ? 'text-ink/80 hover:text-pine' : 'text-white/90 hover:text-white'
-              } ${location.pathname === item.href ? (solid ? 'text-pine' : 'text-white') : ''}`}
+              } ${
+                location.pathname === item.href || location.pathname.startsWith(`${item.href}/`)
+                  ? solid
+                    ? 'text-pine'
+                    : 'text-white'
+                  : ''
+              }`}
             >
               {item.label}
             </Link>
@@ -73,7 +79,7 @@ export default function Header() {
 
         <div className="hidden items-center gap-3 lg:flex">
           <button type="button" onClick={onBookNow} className="btn btn-primary !min-h-11 !px-5 !text-sm">
-            Book Now
+            Book
           </button>
         </div>
 
@@ -122,7 +128,7 @@ export default function Header() {
             </Link>
           ))}
           <button type="button" onClick={onBookNow} className="btn btn-primary mt-2 w-full">
-            Book Now
+            Book
           </button>
         </nav>
       </div>

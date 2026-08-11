@@ -18,6 +18,7 @@ import { siteConfig } from '../config/site'
 const HASH_REDIRECTS = {
   about: '/about',
   stay: '/stay',
+  camping: '/camping',
   experience: '/experience',
   gallery: '/gallery',
   reels: '/reels',

@@ -2,6 +2,8 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { LeadProvider } from './context/LeadContext'
 import HomePage from './pages/HomePage'
 import StayPage from './pages/StayPage'
+import CampingPage from './pages/CampingPage'
+import CampingDetailPage from './pages/CampingDetailPage'
 import ExperiencePage from './pages/ExperiencePage'
 import AboutPage from './pages/AboutPage'
 import VolunteerPage from './pages/VolunteerPage'
@@ -17,6 +19,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/stay" element={<StayPage />} />
+          <Route path="/camping" element={<CampingPage />} />
+          <Route path="/camping/:slug" element={<CampingDetailPage />} />
           <Route path="/experience" element={<ExperiencePage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/volunteer" element={<VolunteerPage />} />

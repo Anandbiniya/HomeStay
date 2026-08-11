@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { accommodations } from '../data/content'
+import { accommodations, bookableOptions } from '../data/content'
 import { useReveal } from '../hooks/useReveal'
 import { siteConfig } from '../config/site'
 import { useLead } from '../context/LeadContext'
@@ -12,21 +12,37 @@ const initialForm = {
   phone: '',
   email: '',
   guests: '2',
-  accommodation: accommodations[0]?.name || '',
+  accommodation: '',
   checkIn: '',
   checkOut: '',
   message: '',
 }
 
-export default function Booking() {
+export default function Booking({
+  lockedAccommodation = '',
+  options,
+  accommodationLabel = 'Accommodation',
+  title,
+  lead,
+}) {
   const ref = useReveal()
   const { contact, bookingPrefill, ensureContact, trackEvent } = useLead()
-  const [form, setForm] = useState(initialForm)
+  const selectableOptions = options || bookableOptions || accommodations
+  const [form, setForm] = useState({
+    ...initialForm,
+    accommodation: lockedAccommodation || selectableOptions[0]?.name || '',
+  })
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [statusNote, setStatusNote] = useState('')
 
   const today = useMemo(() => new Date().toISOString().split('T')[0], [])
+  const accommodationLocked = Boolean(lockedAccommodation)
+
+  useEffect(() => {
+    if (!lockedAccommodation) return
+    setForm((prev) => ({ ...prev, accommodation: lockedAccommodation }))
+  }, [lockedAccommodation])
 
   useEffect(() => {
     if (!contact) return
@@ -42,13 +58,15 @@ export default function Booking() {
     if (!bookingPrefill) return
     setForm((prev) => ({
       ...prev,
-      accommodation: bookingPrefill.accommodation || prev.accommodation,
+      accommodation: accommodationLocked
+        ? lockedAccommodation
+        : bookingPrefill.accommodation || prev.accommodation,
       guests: bookingPrefill.guests || prev.guests,
       name: contact?.name || prev.name,
       phone: contact?.phone || prev.phone,
       email: contact?.email || prev.email,
     }))
-  }, [bookingPrefill, contact])
+  }, [bookingPrefill, contact, accommodationLocked, lockedAccommodation])
 
   const onChange = (event) => {
     const { name, value } = event.target
@@ -154,10 +172,12 @@ export default function Booking() {
         <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-12">
           <div>
             <p className="section-label">Booking</p>
-            <h2 className="section-title">Reserve your stay through WhatsApp</h2>
+            <h2 className="section-title">
+              {title || 'Reserve your stay through WhatsApp'}
+            </h2>
             <p className="section-lead">
-              There is no online payment here. Share your details, and we notify the host securely, then
-              open WhatsApp so you can continue the conversation.
+              {lead ||
+                'There is no online payment here. Share your details, and we notify the host securely, then open WhatsApp so you can continue the conversation.'}
             </p>
 
             <div className="mt-8 space-y-4 rounded-[1.4rem] border border-pine/10 bg-white p-6 shadow-[var(--shadow-card)]">
@@ -235,20 +255,30 @@ export default function Booking() {
                 </select>
               </Field>
 
-              <Field label="Accommodation" htmlFor="accommodation">
-                <select
-                  id="accommodation"
-                  name="accommodation"
-                  value={form.accommodation}
-                  onChange={onChange}
-                  className="field-input"
-                >
-                  {accommodations.map((item) => (
-                    <option key={item.id} value={item.name}>
-                      {item.name}
-                    </option>
-                  ))}
-                </select>
+              <Field label={`${accommodationLabel}${accommodationLocked ? '' : ''}`} htmlFor="accommodation">
+                {accommodationLocked ? (
+                  <input
+                    id="accommodation"
+                    name="accommodation"
+                    value={form.accommodation}
+                    className="field-input"
+                    readOnly
+                  />
+                ) : (
+                  <select
+                    id="accommodation"
+                    name="accommodation"
+                    value={form.accommodation}
+                    onChange={onChange}
+                    className="field-input"
+                  >
+                    {selectableOptions.map((item) => (
+                      <option key={item.id || item.name} value={item.name}>
+                        {item.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </Field>
 
               <Field label="Check-in" htmlFor="checkIn">

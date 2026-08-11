@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useReveal } from '../hooks/useReveal'
 import {
   getMonthlyGoogleReviews,
+  getReviewsByContext,
   getReviewsMonthLabel,
   googleReviews,
   googleReviewsMeta,
@@ -10,34 +11,42 @@ import SectionCta from './SectionCta'
 
 /**
  * @param {'preview' | 'monthly' | 'all'} variant
- * preview: highlighted subset for home/stay
- * monthly: month-rotated set (previous default behaviour)
- * all: complete curated Google review pool
+ * @param {'stay' | 'camping' | 'hostillam' | undefined} context
  */
-export default function Reviews({ variant = 'monthly', limit }) {
+export default function Reviews({
+  variant = 'monthly',
+  limit,
+  context,
+  title = 'What guests say on Google',
+  lead,
+  sectionLabel = 'Reviews',
+}) {
   const ref = useReveal()
   const monthLabel = useMemo(() => getReviewsMonthLabel(), [])
 
   const reviews = useMemo(() => {
-    if (variant === 'all') return googleReviews
+    if (variant === 'all') {
+      return context ? getReviewsByContext(context) : googleReviews
+    }
     const count = typeof limit === 'number' ? limit : variant === 'preview' ? 3 : 5
-    return getMonthlyGoogleReviews(new Date(), count)
-  }, [variant, limit])
+    return getMonthlyGoogleReviews(new Date(), count, context)
+  }, [variant, limit, context])
 
   const isPreview = variant === 'preview'
+  const defaultLead = context === 'camping'
+    ? 'Guest words about the Hostillam / My Magic Place camping experience.'
+    : context === 'stay'
+      ? 'Guest words about staying at Hostillam Veedu and the Hostillam home.'
+      : 'A few recent Google reviews from travellers who stayed at Hostillam. This set refreshes each month.'
 
   return (
     <section id="reviews" className="section">
       <div ref={ref} className="container-site reveal">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
-            <p className="section-label">Reviews</p>
-            <h2 className="section-title">What guests say on Google</h2>
-            <p className="section-lead">
-              {variant === 'all'
-                ? 'Every curated Google review we feature on Hostillam — real words from travellers who stayed with us.'
-                : 'A few recent Google reviews from travellers who stayed at Hostillam. This set refreshes each month.'}
-            </p>
+            <p className="section-label">{sectionLabel}</p>
+            <h2 className="section-title">{title}</h2>
+            <p className="section-lead">{lead || defaultLead}</p>
           </div>
 
           <div className="rounded-[1.25rem] border border-pine/10 bg-white px-5 py-4 shadow-[var(--shadow-card)]">

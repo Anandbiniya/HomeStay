@@ -5,8 +5,9 @@ import SectionCta from './SectionCta'
 
 const API_BASE = import.meta.env.VITE_API_BASE || '/api'
 
-async function fetchReelsFeed() {
-  const response = await fetch(`${API_BASE}/instagram/reels`)
+async function fetchReelsFeed(username) {
+  const query = username ? `?username=${encodeURIComponent(username)}` : ''
+  const response = await fetch(`${API_BASE}/instagram/reels${query}`)
   const data = await response.json().catch(() => ({}))
   if (!response.ok) {
     throw new Error(data.error || 'Failed to load Instagram reels')
@@ -17,8 +18,11 @@ async function fetchReelsFeed() {
 export default function InstagramReels({
   variant = 'full',
   limit,
+  username,
   title = instagramConfig.title,
   lead = instagramConfig.lead,
+  sectionLabel = 'From Hostillam',
+  viewAllTo = '/reels',
 }) {
   const ref = useReveal()
   const sectionRef = useRef(null)
@@ -32,13 +36,14 @@ export default function InstagramReels({
   const isPreview = variant === 'preview'
   const visibleLimit =
     typeof limit === 'number' ? limit : isPreview ? 3 : instagramConfig.visibleCount
+  const feedUsername = username || instagramConfig.handle
 
   useEffect(() => {
     let cancelled = false
 
     const load = async () => {
       try {
-        const data = await fetchReelsFeed()
+        const data = await fetchReelsFeed(feedUsername)
         if (cancelled) return
         setFeed(data)
         setError('')
@@ -57,7 +62,7 @@ export default function InstagramReels({
       cancelled = true
       window.clearInterval(timer)
     }
-  }, [])
+  }, [feedUsername])
 
   const reels = (feed?.reels || []).slice(0, visibleLimit)
   const profileUrl = feed?.profileUrl || instagramConfig.profileUrl
@@ -118,13 +123,21 @@ export default function InstagramReels({
       <div ref={ref} className="container-site reveal">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
-            <p className="section-label">From Hostillam</p>
+            <p className="section-label">{sectionLabel}</p>
             <h2 className="section-title">{title}</h2>
             <p className="section-lead">{lead}</p>
           </div>
 
           <div className="flex flex-wrap gap-3">
-            {isPreview ? <SectionCta to="/reels">Watch all reels</SectionCta> : null}
+            {isPreview ? (
+              viewAllTo.startsWith('http') ? (
+                <a href={viewAllTo} target="_blank" rel="noreferrer" className="btn btn-outline">
+                  Watch all reels
+                </a>
+              ) : (
+                <SectionCta to={viewAllTo}>Watch all reels</SectionCta>
+              )
+            ) : null}
             <a href={profileUrl} target="_blank" rel="noreferrer" className="btn btn-outline">
               @{handle}
             </a>
@@ -216,7 +229,15 @@ export default function InstagramReels({
             </div>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              {isPreview ? <SectionCta to="/reels">View all reels</SectionCta> : null}
+              {isPreview ? (
+                viewAllTo.startsWith('http') ? (
+                  <a href={viewAllTo} target="_blank" rel="noreferrer" className="btn btn-outline">
+                    View all reels
+                  </a>
+                ) : (
+                  <SectionCta to={viewAllTo}>View all reels</SectionCta>
+                )
+              ) : null}
               <a
                 href={`${profileUrl}reels/`}
                 target="_blank"
