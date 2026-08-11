@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useReveal } from '../hooks/useReveal'
 import { instagramConfig } from '../data/instagram'
 
@@ -15,10 +15,13 @@ async function fetchReelsFeed() {
 
 export default function InstagramReels() {
   const ref = useReveal()
+  const sectionRef = useRef(null)
+  const videoRefs = useRef(new Map())
   const [feed, setFeed] = useState(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
-  const [activeId, setActiveId] = useState(null)
+  const [activeIndex, setActiveIndex] = useState(0)
+  const [sectionVisible, setSectionVisible] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -29,6 +32,7 @@ export default function InstagramReels() {
         if (cancelled) return
         setFeed(data)
         setError('')
+        setActiveIndex(0)
       } catch (err) {
         if (cancelled) return
         setError(err.message || 'Could not load reels')
@@ -49,8 +53,58 @@ export default function InstagramReels() {
   const profileUrl = feed?.profileUrl || instagramConfig.profileUrl
   const handle = feed?.username || instagramConfig.handle
 
+  useEffect(() => {
+    const node = sectionRef.current
+    if (!node) return undefined
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setSectionVisible(Boolean(entry?.isIntersecting)),
+      { threshold: 0.35 },
+    )
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [loading, reels.length])
+
+  useEffect(() => {
+    if (!reels.length) return undefined
+
+    let cancelled = false
+
+    const syncPlayback = async () => {
+      const entries = [...videoRefs.current.entries()]
+      await Promise.all(
+        entries.map(async ([index, video]) => {
+          if (!video) return
+          const shouldPlay = sectionVisible && index === activeIndex
+          if (!shouldPlay) {
+            video.pause()
+            video.currentTime = 0
+            return
+          }
+          try {
+            video.muted = true
+            await video.play()
+          } catch {
+            // Autoplay can be blocked until the section is interacted with.
+          }
+        }),
+      )
+    }
+
+    syncPlayback()
+    return () => {
+      cancelled = true
+      void cancelled
+    }
+  }, [activeIndex, reels, sectionVisible])
+
+  const advance = () => {
+    if (reels.length < 2) return
+    setActiveIndex((current) => (current + 1) % reels.length)
+  }
+
   return (
-    <section id="reels" className="section bg-[rgb(231_235_228_/_0.4)]">
+    <section id="reels" className="section bg-[rgb(231_235_228_/_0.4)]" ref={sectionRef}>
       <div ref={ref} className="container-site reveal">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
@@ -87,50 +141,44 @@ export default function InstagramReels() {
         {!loading && reels.length ? (
           <>
             <div className="mt-10 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-              {reels.map((reel) => {
-                const playing = activeId === reel.id
+              {reels.map((reel, index) => {
+                const isActive = index === activeIndex
                 return (
-                  <article key={reel.id} className="card-surface overflow-hidden">
+                  <article
+                    key={reel.id}
+                    className={`card-surface overflow-hidden transition ${
+                      isActive ? 'ring-2 ring-pine/35' : 'opacity-95'
+                    }`}
+                  >
                     <div className="relative aspect-[9/14] overflow-hidden bg-[linear-gradient(160deg,#d7e0d4_0%,#b7c7b2_55%,#8fa88a_100%)]">
-                      {playing && reel.videoUrl ? (
+                      {reel.videoUrl ? (
                         <video
+                          ref={(node) => {
+                            if (node) videoRefs.current.set(index, node)
+                            else videoRefs.current.delete(index)
+                          }}
                           className="h-full w-full object-cover"
                           src={reel.videoUrl}
                           poster={reel.thumbnailUrl}
-                          controls
-                          autoPlay
+                          muted
                           playsInline
-                          preload="metadata"
+                          preload={isActive ? 'auto' : 'metadata'}
+                          onEnded={advance}
+                          onClick={() => setActiveIndex(index)}
+                          aria-label={reel.caption?.slice(0, 80) || `Instagram reel by @${handle}`}
                         />
                       ) : (
-                        <>
-                          <img
-                            src={reel.thumbnailUrl}
-                            alt={reel.caption?.slice(0, 80) || `Instagram reel by @${handle}`}
-                            className="h-full w-full object-cover"
-                            loading="lazy"
-                            decoding="async"
-                            referrerPolicy="no-referrer"
-                            onError={(event) => {
-                              event.currentTarget.style.opacity = '0'
-                            }}
-                          />
-                          <button
-                            type="button"
-                            className="absolute inset-0 flex items-center justify-center bg-black/15 transition hover:bg-black/25"
-                            onClick={() => {
-                              if (reel.videoUrl) setActiveId(reel.id)
-                              else window.open(reel.permalink, '_blank', 'noopener,noreferrer')
-                            }}
-                            aria-label="Play reel"
-                          >
-                            <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-white/95 text-pine shadow-[var(--shadow-card)]">
-                              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                <path d="M8 5.5v13l11-6.5L8 5.5z" />
-                              </svg>
-                            </span>
-                          </button>
-                        </>
+                        <img
+                          src={reel.thumbnailUrl}
+                          alt={reel.caption?.slice(0, 80) || `Instagram reel by @${handle}`}
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                          decoding="async"
+                          referrerPolicy="no-referrer"
+                          onError={(event) => {
+                            event.currentTarget.style.opacity = '0'
+                          }}
+                        />
                       )}
                     </div>
 
@@ -164,7 +212,7 @@ export default function InstagramReels() {
                 See all reels on Instagram
               </a>
               <p className="text-sm text-muted">
-                This feed updates automatically from @{handle}.
+                Reels play one at a time automatically from @{handle}.
                 {feed?.cached ? ' Showing the latest saved feed.' : ''}
               </p>
             </div>
