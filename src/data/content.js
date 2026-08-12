@@ -16,34 +16,63 @@ import gallery5 from '../assets/images/gallery-5.jpg'
 import gallery6 from '../assets/images/gallery-6.jpg'
 import gallery7 from '../assets/images/gallery-7.jpg'
 import gallery8 from '../assets/images/gallery-8.jpg'
-/** Official @mymagikplace Instagram stills used for Camping visuals. */
+import aboutImage from '../assets/images/about.jpg'
+import heroImage from '../assets/images/hero.jpg'
+/** Official @mymagikplace / @host.illam HD Instagram stills. */
 import magikCampingHero from '../assets/images/camping/magik-1.jpg'
-import magikCampfireNight from '../assets/images/camping/magik-2.jpg'
+import magikFriendsNature from '../assets/images/camping/magik-2.jpg'
 import magikTentMorning from '../assets/images/camping/magik-3.jpg'
 import magikNatureWalk from '../assets/images/camping/magik-4.jpg'
-import magikCampfireFriends from '../assets/images/camping/magik-5.jpg'
+import magikGuestStay from '../assets/images/camping/magik-5.jpg'
 import magikAtvNature from '../assets/images/camping/magik-6.jpg'
+import hdHostSolo from '../assets/images/gallery-hd/hd-host-solo-trip-DblDkDSgWkF.jpg'
+import hdMagikFriends from '../assets/images/gallery-hd/hd-magik-friends-nature-Dar8y0JkUUa.jpg'
+import hdHostMorning from '../assets/images/gallery-hd/hd-host-morning-tent-DbcQ-WXgyeH.jpg'
+import hdMagikTreeTent from '../assets/images/gallery-hd/hd-magik-tree-tent-Cnqr7EDAOLU.jpg'
+import hdHostKalyani from '../assets/images/gallery-hd/hd-host-kalyani-DbTWFbng1UW.jpg'
+import hdMagikHidden from '../assets/images/gallery-hd/hd-magik-hidden-spots-DbiZEgmgMZQ.jpg'
+import hdMagikAtv from '../assets/images/gallery-hd/hd-magik-atv-DbvUqVVATqi.jpg'
 
+/**
+ * Public gallery — Hostillam website photos + HD My Magik Place / Hostillam Instagram stills.
+ * Only higher-quality assets are included (prefer 1080px+ / larger file sizes).
+ */
 export const galleryImages = [
-  { id: 1, src: gallery1, alt: 'Tent camping under open sky', span: 'tall' },
-  { id: 2, src: gallery2, alt: 'Morning light through the trees', span: 'wide' },
-  { id: 3, src: gallery3, alt: 'Campfire glow at dusk', span: 'tall' },
-  { id: 4, src: gallery4, alt: 'Misty mountain landscape', span: 'normal' },
-  { id: 5, src: gallery5, alt: 'Camping under the stars', span: 'tall' },
-  { id: 6, src: gallery6, alt: 'Hiking through forest trails', span: 'wide' },
-  { id: 7, src: gallery7, alt: 'Quiet woodland path', span: 'normal' },
-  { id: 8, src: gallery8, alt: 'Waterfall in the hills', span: 'tall' },
-  // My Magik Place Instagram (@mymagikplace) — camping-only gallery set
-  { id: 101, src: magikCampingHero, alt: 'Tree tent at My Magik Place campsite', span: 'tall' },
-  { id: 102, src: magikCampfireNight, alt: 'Night campfire and lights at My Magik Place', span: 'tall' },
-  { id: 103, src: magikTentMorning, alt: 'Morning inside a tent at My Magik Place', span: 'tall' },
-  { id: 104, src: magikNatureWalk, alt: 'Nature walk through tall grass at My Magik Place', span: 'tall' },
-  { id: 105, src: magikCampfireFriends, alt: 'Friends around a campfire at My Magik Place', span: 'tall' },
-  { id: 106, src: magikAtvNature, alt: 'Outdoor adventure at My Magik Place', span: 'tall' },
+  // Hostillam website gallery (already high-resolution site photos)
+  { id: 1, src: gallery1, alt: 'Tent camping under open sky at Hostillam', span: 'wide', source: 'hostillam' },
+  { id: 2, src: gallery2, alt: 'Morning light through the trees at Hostillam', span: 'wide', source: 'hostillam' },
+  { id: 3, src: gallery3, alt: 'Campfire glow at dusk', span: 'tall', source: 'hostillam' },
+  { id: 4, src: gallery4, alt: 'Misty mountain landscape near Hostillam', span: 'wide', source: 'hostillam' },
+  { id: 5, src: gallery5, alt: 'Camping under the stars', span: 'tall', source: 'hostillam' },
+  { id: 6, src: gallery6, alt: 'Hiking through forest trails', span: 'wide', source: 'hostillam' },
+  { id: 7, src: gallery7, alt: 'Quiet woodland path', span: 'wide', source: 'hostillam' },
+  { id: 8, src: gallery8, alt: 'Waterfall in the hills', span: 'tall', source: 'hostillam' },
+  { id: 9, src: heroImage, alt: 'Looking out from a Hostillam tent into the forest', span: 'wide', source: 'hostillam' },
+  { id: 10, src: aboutImage, alt: 'Soft hills around Hostillam', span: 'wide', source: 'hostillam' },
+  { id: 11, src: stayCottage, alt: 'Hostillam Veedu cottage', span: 'wide', source: 'hostillam' },
+  { id: 12, src: expCampfire, alt: 'Campfire evening at Hostillam', span: 'tall', source: 'hostillam' },
+  { id: 13, src: expNature, alt: 'Nature around Hostillam', span: 'wide', source: 'hostillam' },
+  { id: 14, src: expOutdoor, alt: 'Outdoor day at Hostillam', span: 'wide', source: 'hostillam' },
+  { id: 15, src: hdHostSolo, alt: 'Guest moments from @host.illam', span: 'tall', source: 'hostillam' },
+  { id: 16, src: hdHostMorning, alt: 'Morning tent stay from @host.illam', span: 'tall', source: 'hostillam' },
+  { id: 17, src: hdHostKalyani, alt: 'Work-from-mountain stay with Hostillam', span: 'tall', source: 'hostillam' },
+
+  // My Magik Place HD Instagram
+  { id: 101, src: hdMagikTreeTent, alt: 'Tree tent at My Magik Place', span: 'tall', source: 'mymagikplace' },
+  { id: 102, src: hdMagikFriends, alt: 'Friends and nature at My Magik Place', span: 'tall', source: 'mymagikplace' },
+  { id: 103, src: magikTentMorning, alt: 'Morning inside a tent at My Magik Place', span: 'tall', source: 'mymagikplace' },
+  { id: 104, src: hdMagikHidden, alt: 'Hidden spots and river walks at My Magik Place', span: 'tall', source: 'mymagikplace' },
+  { id: 105, src: magikGuestStay, alt: 'Guest stay moments at My Magik Place', span: 'tall', source: 'mymagikplace' },
+  { id: 106, src: hdMagikAtv, alt: 'Outdoor adventure at My Magik Place', span: 'tall', source: 'mymagikplace' },
+  { id: 107, src: magikNatureWalk, alt: 'Nature walk at My Magik Place', span: 'tall', source: 'mymagikplace' },
 ]
 
 /** Primary camping hero image from @mymagikplace Instagram. */
 export const campingHeroImage = magikCampingHero
+
+export function getGalleryBySource(source) {
+  return galleryImages.filter((image) => image.source === source)
+}
 
 /**
  * All bookable accommodations preserved from the original Hostillam catalogue.
@@ -153,7 +182,7 @@ export const campingOptions = [
     price: null,
     priceNote: null,
     priceLabel: 'Ask host for pitch rates',
-    image: magikCampfireNight,
+    image: magikFriendsNature,
     features: ['Bring your own tent', 'Campsite pitch', 'Nature immersion'],
     galleryIds: [102, 105, 101],
   },

@@ -10,8 +10,8 @@ export default function GalleryPage() {
     <PageShell>
       <PageNavHeader
         eyebrow="Gallery"
-        title="All Hostillam photos"
-        lead="Soft light, open skies, forest paths, and the quiet beauty of days spent outdoors."
+        title="Hostillam & My Magik Place"
+        lead="High-quality photos from the Hostillam website gallery and official Instagram stills from @host.illam and @mymagikplace."
         backTo="/"
         backLabel="Back to Home"
         crumbs={[
