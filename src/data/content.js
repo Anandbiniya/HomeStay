@@ -16,6 +16,13 @@ import gallery5 from '../assets/images/gallery-5.jpg'
 import gallery6 from '../assets/images/gallery-6.jpg'
 import gallery7 from '../assets/images/gallery-7.jpg'
 import gallery8 from '../assets/images/gallery-8.jpg'
+/** Official @mymagikplace Instagram stills used for Camping visuals. */
+import magikCampingHero from '../assets/images/camping/magik-1.jpg'
+import magikCampfireNight from '../assets/images/camping/magik-2.jpg'
+import magikTentMorning from '../assets/images/camping/magik-3.jpg'
+import magikNatureWalk from '../assets/images/camping/magik-4.jpg'
+import magikCampfireFriends from '../assets/images/camping/magik-5.jpg'
+import magikAtvNature from '../assets/images/camping/magik-6.jpg'
 
 export const galleryImages = [
   { id: 1, src: gallery1, alt: 'Tent camping under open sky', span: 'tall' },
@@ -26,7 +33,17 @@ export const galleryImages = [
   { id: 6, src: gallery6, alt: 'Hiking through forest trails', span: 'wide' },
   { id: 7, src: gallery7, alt: 'Quiet woodland path', span: 'normal' },
   { id: 8, src: gallery8, alt: 'Waterfall in the hills', span: 'tall' },
+  // My Magik Place Instagram (@mymagikplace) — camping-only gallery set
+  { id: 101, src: magikCampingHero, alt: 'Tree tent at My Magik Place campsite', span: 'tall' },
+  { id: 102, src: magikCampfireNight, alt: 'Night campfire and lights at My Magik Place', span: 'tall' },
+  { id: 103, src: magikTentMorning, alt: 'Morning inside a tent at My Magik Place', span: 'tall' },
+  { id: 104, src: magikNatureWalk, alt: 'Nature walk through tall grass at My Magik Place', span: 'tall' },
+  { id: 105, src: magikCampfireFriends, alt: 'Friends around a campfire at My Magik Place', span: 'tall' },
+  { id: 106, src: magikAtvNature, alt: 'Outdoor adventure at My Magik Place', span: 'tall' },
 ]
+
+/** Primary camping hero image from @mymagikplace Instagram. */
+export const campingHeroImage = magikCampingHero
 
 /**
  * All bookable accommodations preserved from the original Hostillam catalogue.
@@ -102,9 +119,9 @@ export const campingOptions = [
     price: null,
     priceNote: null,
     priceLabel: 'Ask host for day rates',
-    image: expOutdoor,
+    image: magikNatureWalk,
     features: ['Day visit at the campsite', 'Nature immersion', 'Outdoor activities'],
-    galleryIds: [4, 6, 8],
+    galleryIds: [104, 106, 101],
   },
   {
     id: 'tent-stay',
@@ -118,9 +135,9 @@ export const campingOptions = [
     price: starlitTent.price,
     priceNote: starlitTent.priceNote,
     priceLabel: null,
-    image: starlitTent.image,
+    image: magikCampingHero,
     features: [...starlitTent.features],
-    galleryIds: [1, 3, 5],
+    galleryIds: [101, 103, 105],
     legacyAccommodationId: 'tent',
   },
   {
@@ -136,9 +153,9 @@ export const campingOptions = [
     price: null,
     priceNote: null,
     priceLabel: 'Ask host for pitch rates',
-    image: gallery5,
+    image: magikCampfireNight,
     features: ['Bring your own tent', 'Campsite pitch', 'Nature immersion'],
-    galleryIds: [1, 5, 6],
+    galleryIds: [102, 105, 101],
   },
 ]
 

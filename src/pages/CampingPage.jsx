@@ -5,11 +5,10 @@ import MyMagikPlaceReels from '../components/MyMagikPlaceReels'
 import MyMagikPlaceReviews from '../components/MyMagikPlaceReviews'
 import { BackLink, Breadcrumbs } from '../components/PageNav'
 import { usePageMeta } from '../hooks/usePageMeta'
-import { campingOptions } from '../data/content'
+import { campingHeroImage, campingOptions } from '../data/content'
 import { useLead } from '../context/LeadContext'
 import { useReveal } from '../hooks/useReveal'
 import { Events } from '../services/trackingService'
-import heroCampImage from '../assets/images/stay-tent.jpg'
 
 function priceDisplay(option) {
   if (option.price) {
@@ -27,8 +26,7 @@ export default function CampingPage() {
   usePageMeta('Camping')
   const ref = useReveal()
   const { requestBookNow, trackEvent } = useLead()
-  const heroImage =
-    campingOptions.find((item) => item.id === 'tent-stay')?.image || heroCampImage
+  const heroImage = campingHeroImage || campingOptions.find((item) => item.id === 'tent-stay')?.image
 
   const bookOption = (option, event) => {
     event.preventDefault()

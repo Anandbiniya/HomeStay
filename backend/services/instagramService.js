@@ -4,7 +4,7 @@ import { backendConfig } from '../config.js'
 
 const DEFAULT_USERNAME = 'host.illam'
 const CACHE_TTL_MS = 30 * 60 * 1000 // normal refresh window
-const STALE_TTL_MS = 24 * 60 * 60 * 1000 // keep serving stale data up to 24h on errors
+const STALE_TTL_MS = 7 * 24 * 60 * 60 * 1000 // keep serving stale Magik/Hostillam feeds up to 7 days on IG errors
 
 /** In-memory cache keyed by Instagram username. */
 const memoryCaches = new Map()
