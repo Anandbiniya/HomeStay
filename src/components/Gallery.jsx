@@ -74,8 +74,8 @@ export default function Gallery({ variant = 'full', limit, pagePath = '/gallery'
           <p className="gallery-label">Gallery</p>
           <h2 className="section-title !text-white">Hostillam & My Magik Place</h2>
           <p className="section-lead !text-white/75">
-            A curated HD photo set from the Hostillam website gallery and official Instagram stills
-            from @host.illam and @mymagikplace.
+            A curated photo set from Hostillam Veedu (home) and My Magik Place (camping) —
+            kept in separate sections.
           </p>
         </div>
 

@@ -11,7 +11,7 @@ export default function GalleryPage() {
       <PageNavHeader
         eyebrow="Gallery"
         title="Hostillam & My Magik Place"
-        lead="High-quality photos from the Hostillam website gallery and official Instagram stills from @host.illam and @mymagikplace."
+        lead="Real Hostillam Veedu home photos and My Magik Place camping photos, shown in separate sections."
         backTo="/"
         backLabel="Back to Home"
         crumbs={[

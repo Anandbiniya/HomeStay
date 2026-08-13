@@ -49,10 +49,16 @@ app.get('/api/instagram/reels', async (req, res) => {
     res.set('Cache-Control', 'public, max-age=60')
     return res.json(payload)
   } catch (error) {
-    console.error('[instagram]', error.message)
+    console.error('[instagram]', username, error.message)
+    const detail = error.message || 'Unknown Instagram error'
+    const rateLimited = /\(429\)/.test(detail) || /rate.?limit/i.test(detail)
     return res.status(502).json({
-      error: 'Could not load Instagram reels right now',
-      detail: error.message,
+      error: rateLimited
+        ? 'Instagram rate-limited this server (HTTP 429). Official profile link still works.'
+        : 'Could not load Instagram reels right now',
+      detail,
+      rateLimited,
+      username: username.replace(/^@/, ''),
       profileUrl: `https://www.instagram.com/${username.replace(/^@/, '')}/`,
       reels: [],
     })

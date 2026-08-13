@@ -23,6 +23,7 @@ export default function ExperiencePage() {
       <Experience variant="full" />
       <InstagramReels
         variant="preview"
+        username="host.illam"
         title="Experience Hostillam on Instagram"
         lead="Watch reels that show the real Hostillam experience — then explore the full feed."
       />

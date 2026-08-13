@@ -10,6 +10,7 @@ const {
   stayStoneHouse,
   stayLiving,
   stayGuestRoom,
+  stayBedroom,
   stayApproach,
   stayDriveway,
   stayGarden,
@@ -45,13 +46,13 @@ const {
 } = images
 
 /**
- * Public gallery — Hostillam + camping photos from src/Images (and web copies of HEIC uploads).
+ * Public gallery — Hostillam home photos and Magik camping photos kept separate.
  */
 export const galleryImages = [
-  // Hostillam Veedu / home
-  { id: 1, src: stayVeedu, alt: 'Hostillam Veedu cottage with mural', span: 'wide', source: 'hostillam' },
-  { id: 2, src: stayStoneHouse, alt: 'Stone house at Hostillam', span: 'wide', source: 'hostillam' },
-  { id: 3, src: stayGarden, alt: 'Garden and valley view from Hostillam', span: 'tall', source: 'hostillam' },
+  // Hostillam Veedu / home only
+  { id: 1, src: stayVeedu, alt: 'Hostillam Veedu stone home in the hills', span: 'wide', source: 'hostillam' },
+  { id: 2, src: stayStoneHouse, alt: 'Stone house at Hostillam Veedu', span: 'wide', source: 'hostillam' },
+  { id: 3, src: stayGarden, alt: 'Garden and valley view from Hostillam Veedu', span: 'tall', source: 'hostillam' },
   { id: 4, src: stayLiving, alt: 'Living space inside Hostillam Veedu', span: 'wide', source: 'hostillam' },
   { id: 5, src: stayGuestRoom, alt: 'Guest room at Hostillam Veedu', span: 'tall', source: 'hostillam' },
   { id: 6, src: stayDriveway, alt: 'Driveway approach to Hostillam', span: 'wide', source: 'hostillam' },
@@ -59,8 +60,8 @@ export const galleryImages = [
   { id: 8, src: stayApproach, alt: 'Forest approach path to Hostillam', span: 'tall', source: 'hostillam' },
   { id: 9, src: homeHero, alt: 'Terrace view over Hostillam gardens', span: 'wide', source: 'hostillam' },
   { id: 10, src: about, alt: 'HOSTILLAM HOME entrance sign', span: 'tall', source: 'hostillam' },
-  { id: 11, src: stayVeedu, alt: 'Hostillam Veedu cottage nestled in greenery', span: 'wide', source: 'hostillam' },
-  { id: 12, src: campfire, alt: 'Campfire evening with guests', span: 'tall', source: 'hostillam' },
+  { id: 11, src: stayBedroom, alt: 'Bedroom at Hostillam Veedu', span: 'wide', source: 'hostillam' },
+  { id: 12, src: stayGarden, alt: 'Outdoor garden and fire pit at Hostillam Veedu', span: 'tall', source: 'hostillam' },
   { id: 13, src: natureWalks, alt: 'Nature walk near Hostillam', span: 'wide', source: 'hostillam' },
   { id: 14, src: outdoorEscapes, alt: 'Mountain viewpoint near Kodaikanal', span: 'wide', source: 'hostillam' },
   { id: 15, src: stayMural, alt: 'Mural path at Hostillam', span: 'tall', source: 'hostillam' },
@@ -78,7 +79,7 @@ export const galleryImages = [
   { id: 27, src: location, alt: 'Flowers and valley view near Hostillam', span: 'wide', source: 'hostillam' },
   { id: 28, src: volunteer, alt: 'Walking into the forest near Hostillam', span: 'tall', source: 'hostillam' },
 
-  // My Magik Place / camping
+  // My Magik Place / camping only
   { id: 101, src: campingRooftopTent, alt: 'Rooftop tent at the campsite', span: 'tall', source: 'mymagikplace' },
   { id: 102, src: campingFriendsStream, alt: 'Friends by the stream at camp', span: 'tall', source: 'mymagikplace' },
   { id: 103, src: campingRooftopLadder, alt: 'Climbing into a rooftop tent', span: 'tall', source: 'mymagikplace' },
@@ -92,7 +93,6 @@ export const galleryImages = [
   { id: 112, src: makeYourOwnPitch, alt: 'Blue tent pitched with mountain views', span: 'wide', source: 'mymagikplace' },
   { id: 113, src: campfireNight, alt: 'Campfire night at My Magik Place', span: 'tall', source: 'mymagikplace' },
   { id: 114, src: campingNightVehicles, alt: 'Night camping with vehicles and lights', span: 'wide', source: 'mymagikplace' },
-  { id: 115, src: food, alt: 'Sharing food at the campsite', span: 'tall', source: 'mymagikplace' },
 ]
 
 /** Primary camping hero image — real uploaded campsite photo. */
@@ -110,16 +110,17 @@ export const accommodations = [
   {
     id: 'veedu',
     name: 'Hostillam Veedu',
-    type: 'Cottage',
+    type: 'Homestay',
     description:
       'Our earth-toned home nestled in greenery — a peaceful retreat with warm rooms, shared living spaces, and the comfort of a true local stay.',
-    capacity: 'Up to 8 guests',
-    capacityValue: 8,
-    price: '₹4,500',
+    capacity: 'Up to 6 guests',
+    capacityValue: 6,
+    price: '₹6,000',
     priceNote: 'per night',
     image: stayVeedu,
     features: ['Home-cooked meals on request', 'Garden & outdoor spaces', 'Family-friendly'],
-    galleryIds: [11, 18, 19, 20, 2, 4],
+    // Homestay interiors + garden only — no camping/tent photos
+    galleryIds: [1, 11, 4, 5, 3, 6],
   },
   {
     id: 'tent',
@@ -248,6 +249,7 @@ export const experiences = [
     id: 'food',
     title: 'Home-Cooked Food',
     description: 'Warm local meals made with care — simple flavours that feel like home.',
+    // Missing uploaded Hostillam food photo — do not substitute Magik camping images
     image: food,
   },
   {

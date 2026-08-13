@@ -20,7 +20,7 @@ export default function ReelsPage() {
           { label: 'Reels' },
         ]}
       />
-      <InstagramReels variant="full" />
+      <InstagramReels variant="full" username={instagramConfig.handle} />
     </PageShell>
   )
 }

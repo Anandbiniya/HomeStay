@@ -16,7 +16,8 @@ async function fetchReelsFeed(username) {
     })
     const data = await response.json().catch(() => ({}))
     if (!response.ok) {
-      throw new Error(data.error || 'Failed to load Instagram reels')
+      const parts = [data.error, data.detail].filter(Boolean)
+      throw new Error(parts.join(' — ') || 'Failed to load Instagram reels')
     }
     return data
   } catch (err) {
@@ -237,7 +238,9 @@ export default function InstagramReels({
             </p>
             <p className="mt-3 text-sm text-muted">
               {error
-                ? 'Live Instagram embeds are limited right now, so we send you to the official account instead of showing a broken player.'
+                ? /\(429\)|rate-limited/i.test(error)
+                  ? `Instagram returned HTTP 429 (rate limit) for @${handle}. Open the official account to watch reels until the limit resets.`
+                  : 'Live Instagram embeds are limited right now, so we send you to the official account instead of showing a broken player.'
                 : 'Open the official Instagram account to watch the latest reels.'}
             </p>
             <a
