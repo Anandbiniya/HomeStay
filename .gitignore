@@ -27,3 +27,4 @@ backend/data/store.json
 
 # Runtime caches
 backend/data/*.json
+backend/data/instagram-videos/
