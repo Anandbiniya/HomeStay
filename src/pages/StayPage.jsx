@@ -168,6 +168,7 @@ export default function StayPage() {
       <InstagramReels
         variant="preview"
         username="host.illam"
+        preferStills
         sectionLabel="Hostillam on Instagram"
         title="Hostillam Instagram social proof"
         lead="Moments from @host.illam — a closer look at life at Hostillam Veedu."
