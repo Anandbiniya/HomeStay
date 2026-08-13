@@ -48,9 +48,8 @@ export const siteConfig = {
     { label: 'Volunteer', href: '/volunteer' },
   ],
 
-  /** Footer Explore column. */
+  /** Footer Explore column. (About is home-page content only — not linked in chrome.) */
   footerExplore: [
-    { label: 'About', href: '/about' },
     { label: 'Stay', href: '/stay' },
     { label: 'Camping', href: '/camping' },
     { label: 'Experience', href: '/experience' },

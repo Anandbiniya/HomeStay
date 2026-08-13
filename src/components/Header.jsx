@@ -3,6 +3,14 @@ import { Link, useLocation } from 'react-router-dom'
 import { useLead } from '../context/LeadContext'
 import { siteConfig } from '../config/site'
 
+/** Navbar links — About must never appear here (About content stays on the home page). */
+const PRIMARY_NAV = [
+  { label: 'Stay', href: '/stay' },
+  { label: 'Camping', href: '/camping' },
+  { label: 'Experience', href: '/experience' },
+  { label: 'Volunteer', href: '/volunteer' },
+]
+
 export default function Header() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -57,8 +65,8 @@ export default function Header() {
           {siteConfig.brand}
         </Link>
 
-        <nav className="hidden items-center gap-7 lg:flex">
-          {siteConfig.primaryNav.map((item) => (
+        <nav className="hidden items-center gap-7 lg:flex" aria-label="Primary">
+          {PRIMARY_NAV.map((item) => (
             <Link
               key={item.href}
               to={item.href}
@@ -116,8 +124,8 @@ export default function Header() {
       </div>
 
       <div className={`border-t border-pine/10 bg-mist-soft lg:hidden ${open ? 'block' : 'hidden'}`}>
-        <nav className="container-site flex flex-col gap-1 py-4">
-          {siteConfig.primaryNav.map((item) => (
+        <nav className="container-site flex flex-col gap-1 py-4" aria-label="Mobile primary">
+          {PRIMARY_NAV.map((item) => (
             <Link
               key={item.href}
               to={item.href}
