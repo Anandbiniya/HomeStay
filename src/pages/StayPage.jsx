@@ -64,6 +64,29 @@ export default function StayPage() {
             <p className="mt-4 max-w-2xl text-[1.08rem] leading-relaxed text-white/88">
               {veedu.description}
             </p>
+
+            <ul className="mt-6 flex flex-col gap-2.5 text-[1.02rem] text-white/90 sm:flex-row sm:flex-wrap sm:gap-x-6 sm:gap-y-2">
+              {veedu.features.map((feature) => (
+                <li key={feature} className="flex items-start gap-2.5">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-amber" />
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-6 flex flex-wrap items-end gap-6">
+              <div>
+                <p className="text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-white/70">
+                  Capacity
+                </p>
+                <p className="mt-1 font-display text-2xl text-white sm:text-3xl">{veedu.capacity}</p>
+              </div>
+              <div>
+                <p className="font-display text-3xl text-white sm:text-4xl">{veedu.price}</p>
+                <p className="text-sm text-white/70">{veedu.priceNote}</p>
+              </div>
+            </div>
+
             <button
               type="button"
               className="btn btn-primary mt-8"

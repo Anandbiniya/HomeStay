@@ -25,6 +25,19 @@ import hdMagikTreeTent from '../assets/images/gallery-hd/hd-magik-tree-tent-Cnqr
 import hdHostKalyani from '../assets/images/gallery-hd/hd-host-kalyani-DbTWFbng1UW.jpg'
 import hdMagikHidden from '../assets/images/gallery-hd/hd-magik-hidden-spots-DbiZEgmgMZQ.jpg'
 import hdMagikAtv from '../assets/images/gallery-hd/hd-magik-atv-DbvUqVVATqi.jpg'
+/** Real photos uploaded by the host (Google Drive “kodai photo” set). */
+import uploadVeeduCottage from '../assets/images/uploads/hostillam/veedu-cottage.jpg'
+import uploadApproachPath from '../assets/images/uploads/hostillam/approach-path.jpg'
+import uploadValleyView from '../assets/images/uploads/hostillam/valley-view.jpg'
+import uploadOutdoorView from '../assets/images/uploads/hostillam/outdoor-view.jpg'
+import uploadCampsiteFriends from '../assets/images/uploads/camping/campsite-friends.jpg'
+import uploadTentAtv from '../assets/images/uploads/camping/tent-atv.jpg'
+import uploadTentView from '../assets/images/uploads/camping/tent-view.jpg'
+import uploadCampfireNight from '../assets/images/uploads/camping/campfire-night.jpg'
+import uploadForestWalk from '../assets/images/uploads/kodai/forest-walk.jpg'
+import uploadMountainViewpoint from '../assets/images/uploads/kodai/mountain-viewpoint.jpg'
+import uploadTrailWalk from '../assets/images/uploads/kodai/trail-walk.jpg'
+import uploadStreamCrossing from '../assets/images/uploads/kodai/stream-crossing.jpg'
 /** Official @mymagikplace camping stills (see data/magikMedia.js + camping/SOURCES.json). */
 import { magikProductImages, magikGalleryExtras } from './magikMedia'
 
@@ -34,6 +47,9 @@ const magikFriendsNature = magikProductImages.makeYourOwnPitch
 const magikNatureWalk = magikProductImages.dayCamping
 const magikTentMorning = magikGalleryExtras.morningTent
 const magikAtvNature = magikGalleryExtras.outdoorAdventure
+
+/** Preferred Hostillam Veedu hero — real uploaded cottage photo. */
+const hostillamVeeduImage = uploadVeeduCottage || stayCottage
 
 /**
  * Public gallery — Hostillam website photos + HD My Magik Place / Hostillam Instagram stills.
@@ -51,13 +67,21 @@ export const galleryImages = [
   { id: 8, src: gallery8, alt: 'Waterfall in the hills', span: 'tall', source: 'hostillam' },
   { id: 9, src: heroImage, alt: 'Looking out from a Hostillam tent into the forest', span: 'wide', source: 'hostillam' },
   { id: 10, src: aboutImage, alt: 'Soft hills around Hostillam', span: 'wide', source: 'hostillam' },
-  { id: 11, src: stayCottage, alt: 'Hostillam Veedu cottage', span: 'wide', source: 'hostillam' },
+  { id: 11, src: hostillamVeeduImage, alt: 'Hostillam Veedu cottage nestled in greenery', span: 'wide', source: 'hostillam' },
   { id: 12, src: expCampfire, alt: 'Campfire evening at Hostillam', span: 'tall', source: 'hostillam' },
   { id: 13, src: expNature, alt: 'Nature around Hostillam', span: 'wide', source: 'hostillam' },
   { id: 14, src: expOutdoor, alt: 'Outdoor day at Hostillam', span: 'wide', source: 'hostillam' },
   { id: 15, src: hdHostSolo, alt: 'Guest moments from @host.illam', span: 'tall', source: 'hostillam' },
   { id: 16, src: hdHostMorning, alt: 'Morning tent stay from @host.illam', span: 'tall', source: 'hostillam' },
   { id: 17, src: hdHostKalyani, alt: 'Work-from-mountain stay with Hostillam', span: 'tall', source: 'hostillam' },
+  // Real uploaded Hostillam / Kodai photos (Drive)
+  { id: 18, src: uploadApproachPath, alt: 'Path through greenery toward Hostillam', span: 'tall', source: 'hostillam' },
+  { id: 19, src: uploadValleyView, alt: 'Valley and hills around Hostillam, Kodaikanal', span: 'wide', source: 'hostillam' },
+  { id: 20, src: uploadOutdoorView, alt: 'Outdoor garden view with steel tumbler at Hostillam', span: 'tall', source: 'hostillam' },
+  { id: 21, src: uploadForestWalk, alt: 'Forest nature walk near Kodaikanal', span: 'tall', source: 'hostillam' },
+  { id: 22, src: uploadMountainViewpoint, alt: 'Mountain viewpoint on a Kodaikanal nature walk', span: 'tall', source: 'hostillam' },
+  { id: 23, src: uploadTrailWalk, alt: 'Trail walk through Kodaikanal forest', span: 'tall', source: 'hostillam' },
+  { id: 24, src: uploadStreamCrossing, alt: 'Stream crossing on a Kodaikanal nature trail', span: 'wide', source: 'hostillam' },
 
   // My Magik Place HD Instagram stills (authentic campsite photos only — no logos)
   { id: 101, src: hdMagikTreeTent, alt: 'Tree tent at My Magik Place', span: 'tall', source: 'mymagikplace' },
@@ -68,10 +92,15 @@ export const galleryImages = [
   { id: 107, src: magikNatureWalk, alt: 'Nature walk / day at My Magik Place', span: 'tall', source: 'mymagikplace' },
   { id: 108, src: magikAtvNature, alt: 'Campsite outdoor moments at My Magik Place', span: 'tall', source: 'mymagikplace' },
   { id: 109, src: magikCampingHero, alt: 'Tree tent campsite at My Magik Place', span: 'tall', source: 'mymagikplace' },
+  // Real uploaded camping photos (Drive)
+  { id: 110, src: uploadCampsiteFriends, alt: 'Friends at the My Magik Place campsite', span: 'wide', source: 'mymagikplace' },
+  { id: 111, src: uploadTentAtv, alt: 'Tent stay and outdoor adventure at the campsite', span: 'tall', source: 'mymagikplace' },
+  { id: 112, src: uploadTentView, alt: 'View from inside a tent at the campsite', span: 'wide', source: 'mymagikplace' },
+  { id: 113, src: uploadCampfireNight, alt: 'Campfire night at My Magik Place', span: 'tall', source: 'mymagikplace' },
 ]
 
-/** Primary camping hero image from @mymagikplace Instagram. */
-export const campingHeroImage = magikCampingHero
+/** Primary camping hero image — real uploaded campsite photo. */
+export const campingHeroImage = uploadTentAtv || magikCampingHero
 
 export function getGalleryBySource(source) {
   return galleryImages.filter((image) => image.source === source)
@@ -92,10 +121,10 @@ export const accommodations = [
     capacityValue: 8,
     price: '₹4,500',
     priceNote: 'per night',
-    image: stayCottage,
+    image: hostillamVeeduImage,
     features: ['Home-cooked meals on request', 'Garden & outdoor spaces', 'Family-friendly'],
-    // Hostillam Veedu only — cottage + official @host.illam stills (no Magik camping)
-    galleryIds: [11, 15, 17, 16, 10, 9],
+    // Hostillam Veedu only — uploaded cottage + Hostillam/Kodai stills (no Magik camping)
+    galleryIds: [11, 18, 19, 20, 15, 17],
   },
   {
     id: 'tent',
@@ -152,10 +181,10 @@ export const campingOptions = [
     price: null,
     priceNote: null,
     priceLabel: 'Ask host for day rates',
-    // Day outdoors / nature walk — not overnight tent or Veedu rooms
-    image: magikNatureWalk,
+    // Day outdoors / campsite day use — real uploaded photo
+    image: uploadCampsiteFriends,
     features: ['Day visit at the campsite', 'Nature immersion', 'Outdoor activities'],
-    galleryIds: [107, 104, 106],
+    galleryIds: [110, 104, 106],
   },
   {
     id: 'tent-stay',
@@ -169,11 +198,11 @@ export const campingOptions = [
     price: starlitTent.price,
     priceNote: starlitTent.priceNote,
     priceLabel: null,
-    // Tree tent / campsite overnight — Magik Place, not Hostillam Veedu
-    image: magikCampingHero,
+    // Tent / campsite overnight — real uploaded tent photo
+    image: uploadTentAtv,
     features: [...starlitTent.features],
     // Tree tent heroes + outdoor Magik still (avoid Hostillam Veedu room shots)
-    galleryIds: [109, 101, 108],
+    galleryIds: [111, 112, 109],
     legacyAccommodationId: 'tent',
   },
   {
@@ -189,10 +218,10 @@ export const campingOptions = [
     price: null,
     priceNote: null,
     priceLabel: 'Ask host for pitch rates',
-    // Campsite / pitch atmosphere — Magik Place, not Veedu rooms
-    image: magikFriendsNature,
+    // Campsite / pitch atmosphere — real uploaded campsite photo
+    image: uploadTentView,
     features: ['Bring your own tent', 'Campsite pitch', 'Nature immersion'],
-    galleryIds: [102, 108, 104],
+    galleryIds: [112, 110, 113],
   },
 ]
 
@@ -222,7 +251,7 @@ export const experiences = [
     id: 'nature',
     title: 'Nature Walks',
     description: 'Wander through misty trails, quiet forests, and the soft rhythm of mountain mornings.',
-    image: expNature,
+    image: uploadForestWalk || expNature,
   },
   {
     id: 'food',
@@ -246,13 +275,13 @@ export const experiences = [
     id: 'relax',
     title: 'Deep Relaxation',
     description: 'Read, meditate, or simply sit still in green outdoor spaces made for pausing.',
-    image: expRelax,
+    image: uploadOutdoorView || expRelax,
   },
   {
     id: 'outdoor',
     title: 'Outdoor Escapes',
     description: 'Rivers, viewpoints, and scenic day trips — adventure when you want it, calm when you don’t.',
-    image: expOutdoor,
+    image: uploadMountainViewpoint || expOutdoor,
   },
 ]
 

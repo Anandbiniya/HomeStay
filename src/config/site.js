@@ -42,7 +42,6 @@ export const siteConfig = {
 
   /** Minimal primary navbar destinations. */
   primaryNav: [
-    { label: 'About', href: '/about' },
     { label: 'Stay', href: '/stay' },
     { label: 'Camping', href: '/camping' },
     { label: 'Experience', href: '/experience' },

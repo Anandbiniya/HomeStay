@@ -27,4 +27,8 @@ backend/data/store.json
 
 # Runtime caches
 backend/data/*.json
-backend/data/instagram-videos/
+# Note: a few seed reel mp4s may live in backend/data/instagram-videos/ for reliable autoplay.
+# Newly warmed videos can be added locally; prefer regenerating via the API warmer.
+
+# Full-resolution Drive conversion dump (classified copies are kept under uploads/*)
+src/assets/images/uploads/_raw/

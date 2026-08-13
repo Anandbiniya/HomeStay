@@ -1,7 +1,10 @@
 import aboutImage from '../assets/images/about.jpg'
+import uploadValleyView from '../assets/images/uploads/hostillam/valley-view.jpg'
 import { aboutHighlights } from '../data/content'
 import { useReveal } from '../hooks/useReveal'
 import SafeImage from './SafeImage'
+
+const aboutPhoto = uploadValleyView || aboutImage
 
 export default function About() {
   const ref = useReveal()
@@ -13,8 +16,8 @@ export default function About() {
           <div className="relative">
             <div className="overflow-hidden rounded-[1.6rem] shadow-[var(--shadow-soft)]">
               <SafeImage
-                src={aboutImage}
-                alt="Lush green hills surrounding Hostillam"
+                src={aboutPhoto}
+                alt="Hills and greenery around Hostillam in Kodaikanal"
                 className="aspect-[4/5] w-full object-cover sm:aspect-[5/4] lg:aspect-[4/5]"
               />
             </div>
