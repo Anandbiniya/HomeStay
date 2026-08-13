@@ -18,13 +18,6 @@ import gallery7 from '../assets/images/gallery-7.jpg'
 import gallery8 from '../assets/images/gallery-8.jpg'
 import aboutImage from '../assets/images/about.jpg'
 import heroImage from '../assets/images/hero.jpg'
-/** Official @mymagikplace / @host.illam HD Instagram stills. */
-import magikCampingHero from '../assets/images/camping/magik-1.jpg'
-import magikFriendsNature from '../assets/images/camping/magik-2.jpg'
-import magikTentMorning from '../assets/images/camping/magik-3.jpg'
-import magikNatureWalk from '../assets/images/camping/magik-4.jpg'
-import magikAtvNature from '../assets/images/camping/magik-6.jpg'
-// magik-5.jpg is a Magik Place logo graphic — kept in assets, not used as a product photo.
 import hdHostSolo from '../assets/images/gallery-hd/hd-host-solo-trip-DblDkDSgWkF.jpg'
 import hdMagikFriends from '../assets/images/gallery-hd/hd-magik-friends-nature-Dar8y0JkUUa.jpg'
 import hdHostMorning from '../assets/images/gallery-hd/hd-host-morning-tent-DbcQ-WXgyeH.jpg'
@@ -32,6 +25,15 @@ import hdMagikTreeTent from '../assets/images/gallery-hd/hd-magik-tree-tent-Cnqr
 import hdHostKalyani from '../assets/images/gallery-hd/hd-host-kalyani-DbTWFbng1UW.jpg'
 import hdMagikHidden from '../assets/images/gallery-hd/hd-magik-hidden-spots-DbiZEgmgMZQ.jpg'
 import hdMagikAtv from '../assets/images/gallery-hd/hd-magik-atv-DbvUqVVATqi.jpg'
+/** Official @mymagikplace camping stills (see data/magikMedia.js + camping/SOURCES.json). */
+import { magikProductImages, magikGalleryExtras } from './magikMedia'
+
+// magik-5.jpg is a Magik Place logo graphic — kept in assets, not used as a product photo.
+const magikCampingHero = magikProductImages.tentStay
+const magikFriendsNature = magikProductImages.makeYourOwnPitch
+const magikNatureWalk = magikProductImages.dayCamping
+const magikTentMorning = magikGalleryExtras.morningTent
+const magikAtvNature = magikGalleryExtras.outdoorAdventure
 
 /**
  * Public gallery — Hostillam website photos + HD My Magik Place / Hostillam Instagram stills.
@@ -93,7 +95,7 @@ export const accommodations = [
     image: stayCottage,
     features: ['Home-cooked meals on request', 'Garden & outdoor spaces', 'Family-friendly'],
     // Hostillam Veedu only — cottage + official @host.illam stills (no Magik camping)
-    galleryIds: [11, 15, 16, 17, 2, 4],
+    galleryIds: [11, 15, 17, 16, 10, 9],
   },
   {
     id: 'tent',
@@ -170,7 +172,8 @@ export const campingOptions = [
     // Tree tent / campsite overnight — Magik Place, not Hostillam Veedu
     image: magikCampingHero,
     features: [...starlitTent.features],
-    galleryIds: [109, 101, 103],
+    // Tree tent heroes + outdoor Magik still (avoid Hostillam Veedu room shots)
+    galleryIds: [109, 101, 108],
     legacyAccommodationId: 'tent',
   },
   {

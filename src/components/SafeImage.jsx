@@ -11,6 +11,7 @@ export default function SafeImage({
   loading = 'lazy',
   decoding = 'async',
   fetchPriority,
+  sizes,
   onLoad,
   onError,
 }) {
@@ -36,6 +37,7 @@ export default function SafeImage({
       loading={loading}
       decoding={decoding}
       fetchPriority={fetchPriority}
+      sizes={sizes}
       onLoad={onLoad}
       onError={() => {
         if (import.meta.env.DEV) {

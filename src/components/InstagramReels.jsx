@@ -8,12 +8,25 @@ const API_BASE = import.meta.env.VITE_API_BASE || '/api'
 
 async function fetchReelsFeed(username) {
   const query = username ? `?username=${encodeURIComponent(username)}` : ''
-  const response = await fetch(`${API_BASE}/instagram/reels${query}`)
-  const data = await response.json().catch(() => ({}))
-  if (!response.ok) {
-    throw new Error(data.error || 'Failed to load Instagram reels')
+  const controller = new AbortController()
+  const timeout = window.setTimeout(() => controller.abort(), 8000)
+  try {
+    const response = await fetch(`${API_BASE}/instagram/reels${query}`, {
+      signal: controller.signal,
+    })
+    const data = await response.json().catch(() => ({}))
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to load Instagram reels')
+    }
+    return data
+  } catch (err) {
+    if (err?.name === 'AbortError') {
+      throw new Error('Instagram feed timed out')
+    }
+    throw err
+  } finally {
+    window.clearTimeout(timeout)
   }
-  return data
 }
 
 /**

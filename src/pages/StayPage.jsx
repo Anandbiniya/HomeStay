@@ -15,7 +15,7 @@ export default function StayPage() {
   const ref = useReveal()
   const { requestBookNow, trackEvent } = useLead()
   const veedu = hostillamVeedu
-  const photos = getGalleryByIds(veedu.galleryIds)
+  const photos = getGalleryByIds(veedu.galleryIds).filter((image) => image.src !== veedu.image)
 
   const bookVeedu = (source) => {
     trackEvent(Events.BOOK_NOW_CLICKED, {
