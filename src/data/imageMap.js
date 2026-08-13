@@ -42,7 +42,6 @@ import campingFoodShare from '../Images/b8325758-9892-44b0-a008-aa02384acd72.jpg
 /* —— Same Drive photos as HEIC in src/Images; web JPG already in this repo —— */
 import campingTentAtv from '../assets/images/uploads/camping/tent-atv.jpg' // IMG_4202
 import campingCampsiteFriends from '../assets/images/uploads/camping/campsite-friends.jpg' // IMG_4278
-import campingTentView from '../assets/images/uploads/camping/tent-view.jpg' // IMG_4287
 import campingCampfireNight from '../assets/images/uploads/camping/campfire-night.jpg' // IMG_4355
 import hostillamValleyView from '../assets/images/uploads/hostillam/valley-view.jpg' // IMG_4151
 import hostillamOutdoorTumbler from '../assets/images/uploads/hostillam/outdoor-view.jpg' // IMG_3664
