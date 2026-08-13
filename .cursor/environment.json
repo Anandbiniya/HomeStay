@@ -1,0 +1,15 @@
+{
+  "name": "Hostillam website",
+  "install": "npm install",
+  "terminals": [
+    {
+      "name": "Hostillam site",
+      "command": "npm run dev -- --host 0.0.0.0 --port 5173",
+      "description": "Vite frontend (5173) + Express API (3001) via concurrently"
+    }
+  ],
+  "ports": [
+    { "name": "Website", "port": 5173 },
+    { "name": "API", "port": 3001 }
+  ]
+}
