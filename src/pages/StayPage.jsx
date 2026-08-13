@@ -2,6 +2,7 @@ import PageShell from '../components/PageShell'
 import Reviews from '../components/Reviews'
 import Booking from '../components/Booking'
 import InstagramReels from '../components/InstagramReels'
+import SafeImage from '../components/SafeImage'
 import { BackLink, Breadcrumbs } from '../components/PageNav'
 import { usePageMeta } from '../hooks/usePageMeta'
 import { hostillamVeedu, getGalleryByIds } from '../data/content'
@@ -29,10 +30,12 @@ export default function StayPage() {
     <PageShell>
       <section className="relative min-h-[70svh] overflow-hidden md:min-h-[78svh]">
         <div className="hero-media absolute inset-0">
-          <img
+          <SafeImage
             src={veedu.image}
             alt={veedu.name}
             className="h-full w-full object-cover"
+            loading="eager"
+            fetchPriority="high"
           />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(19_40_33_/_0.5)_0%,rgb(19_40_33_/_0.25)_40%,rgb(19_40_33_/_0.78)_100%)]" />
         </div>
@@ -124,11 +127,15 @@ export default function StayPage() {
             <h3 className="section-title">Hostillam Veedu gallery</h3>
             <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <figure className="overflow-hidden rounded-[1.25rem] sm:col-span-2 lg:col-span-2">
-                <img src={veedu.image} alt={veedu.name} className="aspect-[16/10] w-full object-cover" />
+                <SafeImage
+                  src={veedu.image}
+                  alt={veedu.name}
+                  className="aspect-[16/10] w-full object-cover"
+                />
               </figure>
               {photos.map((image) => (
                 <figure key={image.id} className="overflow-hidden rounded-[1.25rem]">
-                  <img
+                  <SafeImage
                     src={image.src}
                     alt={image.alt}
                     className="aspect-[4/3] w-full object-cover"

@@ -3,6 +3,7 @@ import PageShell from '../components/PageShell'
 import Booking from '../components/Booking'
 import MyMagikPlaceReels from '../components/MyMagikPlaceReels'
 import MyMagikPlaceReviews from '../components/MyMagikPlaceReviews'
+import SafeImage from '../components/SafeImage'
 import { BackLink, Breadcrumbs } from '../components/PageNav'
 import { usePageMeta } from '../hooks/usePageMeta'
 import { campingHeroImage, campingOptions } from '../data/content'
@@ -43,10 +44,12 @@ export default function CampingPage() {
     <PageShell>
       <section className="relative min-h-[70svh] overflow-hidden md:min-h-[78svh]">
         <div className="hero-media absolute inset-0">
-          <img
+          <SafeImage
             src={heroImage}
             alt="Camping at My Magik Place, Hostillam"
             className="h-full w-full object-cover"
+            loading="eager"
+            fetchPriority="high"
           />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(19_40_33_/_0.5)_0%,rgb(19_40_33_/_0.28)_42%,rgb(19_40_33_/_0.8)_100%)]" />
         </div>
@@ -101,10 +104,11 @@ export default function CampingPage() {
                 className="card-surface group flex flex-col transition hover:-translate-y-0.5"
               >
                 <div className="relative overflow-hidden">
-                  <img
+                  <SafeImage
                     src={option.image}
                     alt={option.name}
                     className="aspect-[4/3] w-full object-cover transition duration-700 group-hover:scale-[1.04]"
+                    loading="lazy"
                   />
                   <span className="absolute left-4 top-4 rounded-lg bg-white/92 px-3 py-1 text-xs font-bold uppercase tracking-[0.08em] text-pine">
                     My Magik Place

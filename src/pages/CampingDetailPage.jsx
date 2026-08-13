@@ -1,6 +1,7 @@
 import { Link, Navigate, useParams } from 'react-router-dom'
 import PageShell from '../components/PageShell'
 import Booking from '../components/Booking'
+import SafeImage from '../components/SafeImage'
 import { BackLink, Breadcrumbs } from '../components/PageNav'
 import { usePageMeta } from '../hooks/usePageMeta'
 import { getCampingOptionBySlug, getGalleryByIds } from '../data/content'
@@ -32,7 +33,13 @@ export default function CampingDetailPage() {
     <PageShell>
       <section className="relative min-h-[68svh] overflow-hidden md:min-h-[74svh]">
         <div className="hero-media absolute inset-0">
-          <img src={option.image} alt={option.name} className="h-full w-full object-cover" />
+          <SafeImage
+            src={option.image}
+            alt={option.name}
+            className="h-full w-full object-cover"
+            loading="eager"
+            fetchPriority="high"
+          />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(19_40_33_/_0.5)_0%,rgb(19_40_33_/_0.28)_42%,rgb(19_40_33_/_0.8)_100%)]" />
         </div>
         <div className="container-site relative flex min-h-[68svh] items-end pb-14 pt-28 md:min-h-[74svh] md:pb-20">
@@ -120,11 +127,15 @@ export default function CampingDetailPage() {
             <h3 className="section-title">A closer look</h3>
             <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <figure className="overflow-hidden rounded-[1.25rem] sm:col-span-2">
-                <img src={option.image} alt={option.name} className="aspect-[16/10] w-full object-cover" />
+                <SafeImage
+                  src={option.image}
+                  alt={option.name}
+                  className="aspect-[16/10] w-full object-cover"
+                />
               </figure>
               {photos.map((image) => (
                 <figure key={image.id} className="overflow-hidden rounded-[1.25rem]">
-                  <img
+                  <SafeImage
                     src={image.src}
                     alt={image.alt}
                     className="aspect-[4/3] w-full object-cover"

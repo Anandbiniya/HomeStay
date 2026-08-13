@@ -8,6 +8,7 @@ import { volunteerContent } from '../data/volunteer'
 import { siteConfig } from '../config/site'
 import { openWhatsAppVolunteer } from '../utils/whatsapp'
 import heroImage from '../assets/images/exp-outdoor.jpg'
+import SafeImage from '../components/SafeImage'
 
 const initialForm = {
   name: '',
@@ -101,10 +102,12 @@ export default function VolunteerPage() {
     <PageShell>
       <section className="relative min-h-[72svh] overflow-hidden md:min-h-[78svh]">
         <div className="hero-media absolute inset-0">
-          <img
+          <SafeImage
             src={heroImage}
             alt="Outdoor nature stay around Hostillam in Kodaikanal"
             className="h-full w-full object-cover"
+            loading="eager"
+            fetchPriority="high"
           />
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(19_40_33_/_0.55)_0%,rgb(19_40_33_/_0.3)_45%,rgb(19_40_33_/_0.78)_100%)]" />
         </div>

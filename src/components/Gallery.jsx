@@ -3,6 +3,7 @@ import { useReveal } from '../hooks/useReveal'
 import TrackOnce from './TrackOnce'
 import { Events } from '../services/trackingService'
 import SectionCta from './SectionCta'
+import SafeImage from './SafeImage'
 
 function GalleryGrid({ images, priorityCount = 0 }) {
   return (
@@ -12,12 +13,11 @@ function GalleryGrid({ images, priorityCount = 0 }) {
           key={image.id}
           className="mb-4 break-inside-avoid overflow-hidden rounded-[1.2rem] bg-white/5"
         >
-          <img
+          <SafeImage
             src={image.src}
             alt={image.alt}
             className="h-auto w-full object-cover transition duration-500 hover:scale-[1.02]"
             loading={index < priorityCount ? 'eager' : 'lazy'}
-            decoding="async"
             fetchPriority={index < 2 ? 'high' : 'auto'}
           />
         </figure>

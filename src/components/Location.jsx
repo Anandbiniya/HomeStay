@@ -3,6 +3,7 @@ import { siteConfig } from '../config/site'
 import { useReveal } from '../hooks/useReveal'
 import { useLead } from '../context/LeadContext'
 import { Events } from '../services/trackingService'
+import SafeImage from './SafeImage'
 
 export default function Location() {
   const ref = useReveal()
@@ -45,7 +46,7 @@ export default function Location() {
         <div className="mt-10 grid gap-6 lg:grid-cols-[1fr_1.1fr]">
           <div className="space-y-4">
             <div className="overflow-hidden rounded-[1.4rem]">
-              <img
+              <SafeImage
                 src={locationImage}
                 alt="Scenic hills near Hostillam in Kodaikanal"
                 className="aspect-[16/10] w-full object-cover"

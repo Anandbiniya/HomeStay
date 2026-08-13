@@ -23,8 +23,8 @@ import magikCampingHero from '../assets/images/camping/magik-1.jpg'
 import magikFriendsNature from '../assets/images/camping/magik-2.jpg'
 import magikTentMorning from '../assets/images/camping/magik-3.jpg'
 import magikNatureWalk from '../assets/images/camping/magik-4.jpg'
-import magikGuestStay from '../assets/images/camping/magik-5.jpg'
 import magikAtvNature from '../assets/images/camping/magik-6.jpg'
+// magik-5.jpg is a Magik Place logo graphic — kept in assets, not used as a product photo.
 import hdHostSolo from '../assets/images/gallery-hd/hd-host-solo-trip-DblDkDSgWkF.jpg'
 import hdMagikFriends from '../assets/images/gallery-hd/hd-magik-friends-nature-Dar8y0JkUUa.jpg'
 import hdHostMorning from '../assets/images/gallery-hd/hd-host-morning-tent-DbcQ-WXgyeH.jpg'
@@ -57,14 +57,15 @@ export const galleryImages = [
   { id: 16, src: hdHostMorning, alt: 'Morning tent stay from @host.illam', span: 'tall', source: 'hostillam' },
   { id: 17, src: hdHostKalyani, alt: 'Work-from-mountain stay with Hostillam', span: 'tall', source: 'hostillam' },
 
-  // My Magik Place HD Instagram
+  // My Magik Place HD Instagram stills (authentic campsite photos only — no logos)
   { id: 101, src: hdMagikTreeTent, alt: 'Tree tent at My Magik Place', span: 'tall', source: 'mymagikplace' },
   { id: 102, src: hdMagikFriends, alt: 'Friends and nature at My Magik Place', span: 'tall', source: 'mymagikplace' },
   { id: 103, src: magikTentMorning, alt: 'Morning inside a tent at My Magik Place', span: 'tall', source: 'mymagikplace' },
   { id: 104, src: hdMagikHidden, alt: 'Hidden spots and river walks at My Magik Place', span: 'tall', source: 'mymagikplace' },
-  { id: 105, src: magikGuestStay, alt: 'Guest stay moments at My Magik Place', span: 'tall', source: 'mymagikplace' },
   { id: 106, src: hdMagikAtv, alt: 'Outdoor adventure at My Magik Place', span: 'tall', source: 'mymagikplace' },
-  { id: 107, src: magikNatureWalk, alt: 'Nature walk at My Magik Place', span: 'tall', source: 'mymagikplace' },
+  { id: 107, src: magikNatureWalk, alt: 'Nature walk / day at My Magik Place', span: 'tall', source: 'mymagikplace' },
+  { id: 108, src: magikAtvNature, alt: 'Campsite outdoor moments at My Magik Place', span: 'tall', source: 'mymagikplace' },
+  { id: 109, src: magikCampingHero, alt: 'Tree tent campsite at My Magik Place', span: 'tall', source: 'mymagikplace' },
 ]
 
 /** Primary camping hero image from @mymagikplace Instagram. */
@@ -91,7 +92,8 @@ export const accommodations = [
     priceNote: 'per night',
     image: stayCottage,
     features: ['Home-cooked meals on request', 'Garden & outdoor spaces', 'Family-friendly'],
-    galleryIds: [2, 4, 7],
+    // Hostillam Veedu only — cottage + official @host.illam stills (no Magik camping)
+    galleryIds: [11, 15, 16, 17, 2, 4],
   },
   {
     id: 'tent',
@@ -148,9 +150,10 @@ export const campingOptions = [
     price: null,
     priceNote: null,
     priceLabel: 'Ask host for day rates',
+    // Day outdoors / nature walk — not overnight tent or Veedu rooms
     image: magikNatureWalk,
     features: ['Day visit at the campsite', 'Nature immersion', 'Outdoor activities'],
-    galleryIds: [104, 106, 101],
+    galleryIds: [107, 104, 106],
   },
   {
     id: 'tent-stay',
@@ -164,9 +167,10 @@ export const campingOptions = [
     price: starlitTent.price,
     priceNote: starlitTent.priceNote,
     priceLabel: null,
+    // Tree tent / campsite overnight — Magik Place, not Hostillam Veedu
     image: magikCampingHero,
     features: [...starlitTent.features],
-    galleryIds: [101, 103, 105],
+    galleryIds: [109, 101, 103],
     legacyAccommodationId: 'tent',
   },
   {
@@ -182,9 +186,10 @@ export const campingOptions = [
     price: null,
     priceNote: null,
     priceLabel: 'Ask host for pitch rates',
+    // Campsite / pitch atmosphere — Magik Place, not Veedu rooms
     image: magikFriendsNature,
     features: ['Bring your own tent', 'Campsite pitch', 'Nature immersion'],
-    galleryIds: [102, 105, 101],
+    galleryIds: [102, 108, 104],
   },
 ]
 

@@ -4,6 +4,7 @@ import { useLead } from '../context/LeadContext'
 import TrackOnce from './TrackOnce'
 import { Events } from '../services/trackingService'
 import SectionCta from './SectionCta'
+import SafeImage from './SafeImage'
 
 export default function Stay({ variant = 'full', pagePath = '/stay' }) {
   const ref = useReveal()
@@ -38,7 +39,7 @@ export default function Stay({ variant = 'full', pagePath = '/stay' }) {
           <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
             <div className="relative">
               <div className="overflow-hidden rounded-[1.6rem] shadow-[var(--shadow-soft)]">
-                <img
+                <SafeImage
                   src={item.image}
                   alt={item.name}
                   className="aspect-[4/5] w-full object-cover sm:aspect-[5/4] lg:aspect-[4/5]"

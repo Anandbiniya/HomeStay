@@ -1,6 +1,7 @@
 import aboutImage from '../assets/images/about.jpg'
 import { aboutHighlights } from '../data/content'
 import { useReveal } from '../hooks/useReveal'
+import SafeImage from './SafeImage'
 
 export default function About() {
   const ref = useReveal()
@@ -11,7 +12,7 @@ export default function About() {
         <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
           <div className="relative">
             <div className="overflow-hidden rounded-[1.6rem] shadow-[var(--shadow-soft)]">
-              <img
+              <SafeImage
                 src={aboutImage}
                 alt="Lush green hills surrounding Hostillam"
                 className="aspect-[4/5] w-full object-cover sm:aspect-[5/4] lg:aspect-[4/5]"

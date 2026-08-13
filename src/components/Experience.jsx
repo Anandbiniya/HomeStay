@@ -1,6 +1,7 @@
 import { experiences } from '../data/content'
 import { useReveal } from '../hooks/useReveal'
 import SectionCta from './SectionCta'
+import SafeImage from './SafeImage'
 
 export default function Experience({ variant = 'full', limit }) {
   const ref = useReveal()
@@ -30,10 +31,11 @@ export default function Experience({ variant = 'full', limit }) {
                 !isPreview && (index === 0 || index === 3) ? 'sm:col-span-2 lg:col-span-1 xl:col-span-2' : ''
               } ${index === 0 ? 'min-h-[22rem]' : 'min-h-[18rem]'}`}
             >
-              <img
+              <SafeImage
                 src={item.image}
                 alt={item.title}
                 className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-[1.05]"
+                loading="lazy"
               />
               <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_25%,rgb(19_40_33_/_0.82)_100%)]" />
               <div className="relative flex h-full flex-col justify-end p-5 sm:p-6">

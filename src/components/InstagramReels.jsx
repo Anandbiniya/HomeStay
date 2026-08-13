@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useReveal } from '../hooks/useReveal'
 import { instagramConfig } from '../data/instagram'
 import SectionCta from './SectionCta'
+import SafeImage from './SafeImage'
 
 const API_BASE = import.meta.env.VITE_API_BASE || '/api'
 
@@ -15,6 +16,12 @@ async function fetchReelsFeed(username) {
   return data
 }
 
+/**
+ * Instagram reels section.
+ * Instagram CDN video URLs often fail (403). When video cannot play, we show the
+ * official thumbnail + Open on Instagram — never fake reels or blank embeds.
+ * When the feed cannot load at all, a polished View on Instagram CTA remains visible.
+ */
 export default function InstagramReels({
   variant = 'full',
   limit,
@@ -23,6 +30,9 @@ export default function InstagramReels({
   lead = instagramConfig.lead,
   sectionLabel = 'From Hostillam',
   viewAllTo = '/reels',
+  fallbackLead,
+  /** Skip video playback attempts (use when CDN video is known unreliable). */
+  preferStills = false,
 }) {
   const ref = useReveal()
   const sectionRef = useRef(null)
@@ -32,11 +42,20 @@ export default function InstagramReels({
   const [loading, setLoading] = useState(true)
   const [activeIndex, setActiveIndex] = useState(0)
   const [sectionVisible, setSectionVisible] = useState(false)
+  const [failedVideos, setFailedVideos] = useState(() => new Set())
+  const [failedThumbs, setFailedThumbs] = useState(() => new Set())
 
   const isPreview = variant === 'preview'
   const visibleLimit =
     typeof limit === 'number' ? limit : isPreview ? 3 : instagramConfig.visibleCount
   const feedUsername = username || instagramConfig.handle
+
+  useEffect(() => {
+    const node = ref.current
+    if (!node) return undefined
+    const timer = window.setTimeout(() => node.classList.add('is-visible'), 80)
+    return () => window.clearTimeout(timer)
+  }, [ref])
 
   useEffect(() => {
     let cancelled = false
@@ -48,9 +67,12 @@ export default function InstagramReels({
         setFeed(data)
         setError('')
         setActiveIndex(0)
+        setFailedVideos(new Set())
+        setFailedThumbs(new Set())
       } catch (err) {
         if (cancelled) return
         setError(err.message || 'Could not load reels')
+        setFeed(null)
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -67,6 +89,17 @@ export default function InstagramReels({
   const reels = (feed?.reels || []).slice(0, visibleLimit)
   const profileUrl = feed?.profileUrl || `https://www.instagram.com/${feedUsername}/`
   const handle = feed?.username || feedUsername
+  const externalView = typeof viewAllTo === 'string' && viewAllTo.startsWith('http')
+
+  const usableReels = reels.filter((reel, index) => {
+    if (failedThumbs.has(index) && (preferStills || failedVideos.has(index) || !reel.videoUrl)) {
+      return false
+    }
+    return Boolean(reel.thumbnailUrl || (!preferStills && reel.videoUrl))
+  })
+
+  const showFeed = !loading && usableReels.length > 0
+  const showCtaFallback = !loading && !showFeed
 
   useEffect(() => {
     const node = sectionRef.current
@@ -74,53 +107,74 @@ export default function InstagramReels({
 
     const observer = new IntersectionObserver(
       ([entry]) => setSectionVisible(Boolean(entry?.isIntersecting)),
-      { threshold: 0.35 },
+      { threshold: 0.2 },
     )
     observer.observe(node)
     return () => observer.disconnect()
   }, [loading, reels.length])
 
   useEffect(() => {
-    if (!reels.length) return undefined
-
-    let cancelled = false
+    if (preferStills || !reels.length) return undefined
 
     const syncPlayback = async () => {
       const entries = [...videoRefs.current.entries()]
       await Promise.all(
         entries.map(async ([index, video]) => {
           if (!video) return
-          const shouldPlay = sectionVisible && index === activeIndex
+          const shouldPlay = sectionVisible && index === activeIndex && !failedVideos.has(index)
           if (!shouldPlay) {
             video.pause()
-            video.currentTime = 0
+            try {
+              video.currentTime = 0
+            } catch {
+              // ignore
+            }
             return
           }
           try {
             video.muted = true
             await video.play()
           } catch {
-            // Autoplay can be blocked until the section is interacted with.
+            // Autoplay can be blocked; thumbnail fallback remains.
           }
         }),
       )
     }
 
     syncPlayback()
-    return () => {
-      cancelled = true
-      void cancelled
-    }
-  }, [activeIndex, reels, sectionVisible])
+    return undefined
+  }, [activeIndex, reels, sectionVisible, failedVideos, preferStills])
+
+  const markVideoFailed = (index) => {
+    setFailedVideos((prev) => {
+      if (prev.has(index)) return prev
+      const next = new Set(prev)
+      next.add(index)
+      return next
+    })
+  }
+
+  const markThumbFailed = (index) => {
+    setFailedThumbs((prev) => {
+      if (prev.has(index)) return prev
+      const next = new Set(prev)
+      next.add(index)
+      return next
+    })
+  }
 
   const advance = () => {
     if (reels.length < 2) return
     setActiveIndex((current) => (current + 1) % reels.length)
   }
 
+  const fallbackText =
+    fallbackLead ||
+    `See the camping experience, life around the campsite, nature and moments from @${handle}.`
+
   return (
     <section id="reels" className="section bg-[rgb(231_235_228_/_0.4)]" ref={sectionRef}>
-      <div ref={ref} className="container-site reveal">
+      <div ref={ref} className="container-site reveal is-visible">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <p className="section-label">{sectionLabel}</p>
@@ -130,14 +184,18 @@ export default function InstagramReels({
 
           <div className="flex flex-wrap gap-3">
             {isPreview ? (
-              viewAllTo.startsWith('http') ? (
-                <a href={viewAllTo} target="_blank" rel="noreferrer" className="btn btn-outline">
+              externalView ? (
+                <a href={viewAllTo} target="_blank" rel="noreferrer" className="btn btn-primary">
                   View on Instagram
                 </a>
               ) : (
                 <SectionCta to={viewAllTo}>Watch all reels</SectionCta>
               )
-            ) : null}
+            ) : (
+              <a href={profileUrl} target="_blank" rel="noreferrer" className="btn btn-primary">
+                View on Instagram
+              </a>
+            )}
             <a href={profileUrl} target="_blank" rel="noreferrer" className="btn btn-outline">
               @{handle}
             </a>
@@ -152,23 +210,42 @@ export default function InstagramReels({
           </div>
         ) : null}
 
-        {!loading && error && !reels.length ? (
+        {showCtaFallback ? (
           <div className="card-surface mt-10 p-6 sm:p-8">
-            <h3 className="font-display text-2xl text-pine-deep">Instagram is warming up</h3>
+            <h3 className="font-display text-2xl text-pine-deep">
+              {feedUsername === 'mymagikplace'
+                ? 'View My Magik Place on Instagram'
+                : `View @${handle} on Instagram`}
+            </h3>
             <p className="mt-3 max-w-2xl text-[1.02rem] leading-relaxed text-muted">
-              We couldn’t load the latest reels right now. You can still watch everything on Instagram.
+              {fallbackText}
             </p>
-            <a href={profileUrl} target="_blank" rel="noreferrer" className="btn btn-primary mt-6">
+            <p className="mt-3 text-sm text-muted">
+              {error
+                ? 'Live Instagram embeds are limited right now, so we send you to the official account instead of showing a broken player.'
+                : 'Open the official Instagram account to watch the latest reels.'}
+            </p>
+            <a
+              href={profileUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn-primary mt-6"
+            >
               View on Instagram
             </a>
           </div>
         ) : null}
 
-        {!loading && reels.length ? (
+        {showFeed ? (
           <>
             <div className="mt-10 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
               {reels.map((reel, index) => {
+                if (failedThumbs.has(index) && (preferStills || failedVideos.has(index) || !reel.videoUrl)) {
+                  return null
+                }
                 const isActive = index === activeIndex
+                const videoBroken =
+                  preferStills || failedVideos.has(index) || !reel.videoUrl
                 return (
                   <article
                     key={reel.id}
@@ -177,7 +254,7 @@ export default function InstagramReels({
                     }`}
                   >
                     <div className="relative aspect-[9/14] overflow-hidden bg-[linear-gradient(160deg,#d7e0d4_0%,#b7c7b2_55%,#8fa88a_100%)]">
-                      {reel.videoUrl ? (
+                      {!videoBroken ? (
                         <video
                           ref={(node) => {
                             if (node) videoRefs.current.set(index, node)
@@ -185,36 +262,45 @@ export default function InstagramReels({
                           }}
                           className="h-full w-full object-cover"
                           src={reel.videoUrl}
-                          poster={reel.thumbnailUrl}
+                          poster={reel.thumbnailUrl || undefined}
                           muted
                           playsInline
                           preload={isActive ? 'auto' : 'metadata'}
                           onEnded={advance}
                           onClick={() => setActiveIndex(index)}
+                          onError={() => markVideoFailed(index)}
                           aria-label={reel.caption?.slice(0, 80) || `Instagram reel by @${handle}`}
                         />
                       ) : (
-                        <img
-                          src={reel.thumbnailUrl}
-                          alt={reel.caption?.slice(0, 80) || `Instagram reel by @${handle}`}
-                          className="h-full w-full object-cover"
-                          loading="lazy"
-                          decoding="async"
-                          referrerPolicy="no-referrer"
-                          onError={(event) => {
-                            event.currentTarget.style.opacity = '0'
-                          }}
-                        />
+                        <a
+                          href={reel.permalink || profileUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="block h-full w-full"
+                          onClick={() => setActiveIndex(index)}
+                        >
+                          <SafeImage
+                            src={reel.thumbnailUrl}
+                            alt={reel.caption?.slice(0, 80) || `Instagram still by @${handle}`}
+                            className="h-full w-full object-cover"
+                            loading="lazy"
+                            onLoad={undefined}
+                            onError={() => markThumbFailed(index)}
+                          />
+                          <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-pine-deep/70 to-transparent px-4 py-5 text-sm font-semibold text-white">
+                            Open on Instagram
+                          </span>
+                        </a>
                       )}
                     </div>
 
                     <div className="p-4 sm:p-5">
                       <p className="line-clamp-3 text-sm leading-relaxed text-muted">
-                        {reel.caption || 'Watch this Hostillam reel on Instagram.'}
+                        {reel.caption || `Watch this @${handle} reel on Instagram.`}
                       </p>
                       <div className="mt-4 flex flex-wrap gap-2">
                         <a
-                          href={reel.permalink}
+                          href={reel.permalink || profileUrl}
                           target="_blank"
                           rel="noreferrer"
                           className="btn btn-outline !min-h-10 !px-4 !text-sm"
@@ -229,15 +315,9 @@ export default function InstagramReels({
             </div>
 
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              {isPreview ? (
-                viewAllTo.startsWith('http') ? (
-                  <a href={viewAllTo} target="_blank" rel="noreferrer" className="btn btn-outline">
-                    View on Instagram
-                  </a>
-                ) : (
-                  <SectionCta to={viewAllTo}>View all reels</SectionCta>
-                )
-              ) : null}
+              <a href={profileUrl} target="_blank" rel="noreferrer" className="btn btn-primary">
+                View on Instagram
+              </a>
               <a
                 href={`${profileUrl}reels/`}
                 target="_blank"
@@ -247,8 +327,11 @@ export default function InstagramReels({
                 See all reels on Instagram
               </a>
               <p className="text-sm text-muted">
-                Reels play one at a time automatically from @{handle}.
+                Official Instagram: @{handle}.
                 {feed?.cached ? ' Showing the latest saved feed.' : ''}
+                {preferStills || failedVideos.size
+                  ? ' Open Instagram to watch the full reels.'
+                  : ''}
               </p>
             </div>
           </>

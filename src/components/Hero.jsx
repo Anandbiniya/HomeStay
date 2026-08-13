@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import heroImage from '../assets/images/hero.jpg'
 import { siteConfig } from '../config/site'
 import { useLead } from '../context/LeadContext'
+import SafeImage from './SafeImage'
 
 export default function Hero() {
   const { requestBookNow } = useLead()
@@ -9,10 +10,12 @@ export default function Hero() {
   return (
     <section id="home" className="relative min-h-[100svh] overflow-hidden">
       <div className="hero-media absolute inset-0">
-        <img
+        <SafeImage
           src={heroImage}
           alt="Camping under the open sky at Hostillam"
           className="h-full w-full object-cover"
+          loading="eager"
+          fetchPriority="high"
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(19_40_33_/_0.5)_0%,rgb(19_40_33_/_0.28)_42%,rgb(19_40_33_/_0.78)_100%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgb(168_137_69_/_0.14),transparent_42%)]" />
