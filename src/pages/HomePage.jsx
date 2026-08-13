@@ -60,7 +60,6 @@ export default function HomePage() {
       <Experience variant="preview" />
       <InstagramReels
         variant="preview"
-        preferStills
         title="See Hostillam"
         lead="Real moments from @host.illam — campfires, trails, and quiet hill days."
       />

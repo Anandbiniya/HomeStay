@@ -20,7 +20,7 @@ export default function ReelsPage() {
           { label: 'Reels' },
         ]}
       />
-      <InstagramReels variant="full" preferStills />
+      <InstagramReels variant="full" />
     </PageShell>
   )
 }

@@ -15,6 +15,12 @@ import {
   getInstagramReelsFeed,
   withProxiedMediaUrls,
 } from './services/instagramService.js'
+import {
+  cachedVideoFile,
+  hasCachedVideo,
+  warmReelVideos,
+  withCachedVideoUrls,
+} from './services/instagramVideoCache.js'
 
 const app = express()
 app.use(cors())
@@ -35,9 +41,13 @@ app.get('/api/instagram/reels', async (req, res) => {
   try {
     const force = String(req.query.refresh || '') === '1'
     const feed = await getInstagramReelsFeed({ username, force })
-    res.set('Cache-Control', 'public, max-age=300')
-    // Proxy CDN media URLs so browsers are not blocked by Instagram CORP headers.
-    return res.json(withProxiedMediaUrls(feed))
+    // Prefer locally cached mp4s for reliable muted autoplay; proxy remaining CDN URLs.
+    const withCache = await withCachedVideoUrls(feed)
+    const payload = withProxiedMediaUrls(withCache)
+    // Warm missing videos in the background (does not block the response).
+    warmReelVideos(feed.reels || [], { limit: 6 })
+    res.set('Cache-Control', 'public, max-age=60')
+    return res.json(payload)
   } catch (error) {
     console.error('[instagram]', error.message)
     return res.status(502).json({
@@ -46,6 +56,26 @@ app.get('/api/instagram/reels', async (req, res) => {
       profileUrl: `https://www.instagram.com/${username.replace(/^@/, '')}/`,
       reels: [],
     })
+  }
+})
+
+app.get('/api/instagram/video/:shortcode', async (req, res) => {
+  try {
+    const shortcode = String(req.params.shortcode || '').replace(/[^a-zA-Z0-9_-]/g, '')
+    if (!shortcode || !(await hasCachedVideo(shortcode))) {
+      return res.status(404).json({ error: 'Cached reel video not found' })
+    }
+    const file = cachedVideoFile(shortcode)
+    res.set({
+      'Content-Type': 'video/mp4',
+      'Cache-Control': 'public, max-age=604800, immutable',
+      'Cross-Origin-Resource-Policy': 'cross-origin',
+      'Accept-Ranges': 'bytes',
+    })
+    return res.sendFile(file)
+  } catch (error) {
+    console.error('[instagram-video]', error.message)
+    return res.status(502).json({ error: 'Could not load cached reel video' })
   }
 })
 
@@ -142,4 +172,15 @@ app.get('/api/leads', async (_req, res) => {
 
 app.listen(backendConfig.port, () => {
   console.log(`Hostillam lead API listening on http://localhost:${backendConfig.port}`)
+  // Warm a few autoplayable reel videos for Hostillam + My Magik Place in the background.
+  ;(async () => {
+    for (const username of ['host.illam', 'mymagikplace']) {
+      try {
+        const feed = await getInstagramReelsFeed({ username })
+        warmReelVideos(feed.reels || [], { limit: 6 })
+      } catch (error) {
+        console.warn('[instagram-video] startup warm failed', username, error.message)
+      }
+    }
+  })()
 })

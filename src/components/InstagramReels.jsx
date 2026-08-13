@@ -30,10 +30,9 @@ async function fetchReelsFeed(username) {
 }
 
 /**
- * Instagram reels section.
- * Instagram CDN video URLs often fail (403). When video cannot play, we show the
- * official thumbnail + Open on Instagram — never fake reels or blank embeds.
- * When the feed cannot load at all, a polished View on Instagram CTA remains visible.
+ * Instagram reels section with muted autoplay wherever the feed is shown.
+ * Videos play automatically when the section is on screen. If a video cannot
+ * load, we fall back to the official thumbnail + Open on Instagram.
  */
 export default function InstagramReels({
   variant = 'full',
@@ -44,8 +43,7 @@ export default function InstagramReels({
   sectionLabel = 'From Hostillam',
   viewAllTo = '/reels',
   fallbackLead,
-  /** Skip video playback attempts (use when CDN video is known unreliable). */
-  preferStills = false,
+  sectionId = 'reels',
 }) {
   const ref = useReveal()
   const sectionRef = useRef(null)
@@ -53,7 +51,6 @@ export default function InstagramReels({
   const [feed, setFeed] = useState(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
-  const [activeIndex, setActiveIndex] = useState(0)
   const [sectionVisible, setSectionVisible] = useState(false)
   const [failedVideos, setFailedVideos] = useState(() => new Set())
   const [failedThumbs, setFailedThumbs] = useState(() => new Set())
@@ -79,7 +76,6 @@ export default function InstagramReels({
         if (cancelled) return
         setFeed(data)
         setError('')
-        setActiveIndex(0)
         setFailedVideos(new Set())
         setFailedThumbs(new Set())
       } catch (err) {
@@ -99,16 +95,28 @@ export default function InstagramReels({
     }
   }, [feedUsername])
 
+  // Re-fetch shortly after mount so background video caching can attach local mp4 URLs.
+  useEffect(() => {
+    const timer = window.setTimeout(async () => {
+      try {
+        const data = await fetchReelsFeed(feedUsername)
+        setFeed(data)
+        setFailedVideos(new Set())
+      } catch {
+        // keep existing feed
+      }
+    }, 4500)
+    return () => window.clearTimeout(timer)
+  }, [feedUsername])
+
   const reels = (feed?.reels || []).slice(0, visibleLimit)
   const profileUrl = feed?.profileUrl || `https://www.instagram.com/${feedUsername}/`
   const handle = feed?.username || feedUsername
   const externalView = typeof viewAllTo === 'string' && viewAllTo.startsWith('http')
 
   const usableReels = reels.filter((reel, index) => {
-    if (failedThumbs.has(index) && (preferStills || failedVideos.has(index) || !reel.videoUrl)) {
-      return false
-    }
-    return Boolean(reel.thumbnailUrl || (!preferStills && reel.videoUrl))
+    if (failedVideos.has(index) && failedThumbs.has(index)) return false
+    return Boolean(reel.videoUrl || reel.thumbnailUrl)
   })
 
   const showFeed = !loading && usableReels.length > 0
@@ -120,35 +128,34 @@ export default function InstagramReels({
 
     const observer = new IntersectionObserver(
       ([entry]) => setSectionVisible(Boolean(entry?.isIntersecting)),
-      { threshold: 0.2 },
+      { threshold: 0.15 },
     )
     observer.observe(node)
     return () => observer.disconnect()
   }, [loading, reels.length])
 
   useEffect(() => {
-    if (preferStills || !reels.length) return undefined
+    if (!reels.length) return undefined
 
     const syncPlayback = async () => {
       const entries = [...videoRefs.current.entries()]
       await Promise.all(
         entries.map(async ([index, video]) => {
           if (!video) return
-          const shouldPlay = sectionVisible && index === activeIndex && !failedVideos.has(index)
-          if (!shouldPlay) {
+          if (failedVideos.has(index)) return
+          if (!sectionVisible) {
             video.pause()
-            try {
-              video.currentTime = 0
-            } catch {
-              // ignore
-            }
             return
           }
           try {
             video.muted = true
-            await video.play()
+            video.playsInline = true
+            video.loop = true
+            if (video.paused) {
+              await video.play()
+            }
           } catch {
-            // Autoplay can be blocked; thumbnail fallback remains.
+            // Autoplay can be blocked; thumbnail fallback remains if video errors.
           }
         }),
       )
@@ -156,7 +163,7 @@ export default function InstagramReels({
 
     syncPlayback()
     return undefined
-  }, [activeIndex, reels, sectionVisible, failedVideos, preferStills])
+  }, [reels, sectionVisible, failedVideos, feed?.fetchedAt])
 
   const markVideoFailed = (index) => {
     setFailedVideos((prev) => {
@@ -176,17 +183,12 @@ export default function InstagramReels({
     })
   }
 
-  const advance = () => {
-    if (reels.length < 2) return
-    setActiveIndex((current) => (current + 1) % reels.length)
-  }
-
   const fallbackText =
     fallbackLead ||
-    `See the camping experience, life around the campsite, nature and moments from @${handle}.`
+    `See moments from @${handle} on Instagram.`
 
   return (
-    <section id="reels" className="section bg-[rgb(231_235_228_/_0.4)]" ref={sectionRef}>
+    <section id={sectionId} className="section bg-[rgb(231_235_228_/_0.4)]" ref={sectionRef}>
       <div ref={ref} className="container-site reveal is-visible">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
@@ -253,19 +255,12 @@ export default function InstagramReels({
           <>
             <div className="mt-10 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
               {reels.map((reel, index) => {
-                if (failedThumbs.has(index) && (preferStills || failedVideos.has(index) || !reel.videoUrl)) {
+                if (failedVideos.has(index) && failedThumbs.has(index)) {
                   return null
                 }
-                const isActive = index === activeIndex
-                const videoBroken =
-                  preferStills || failedVideos.has(index) || !reel.videoUrl
+                const videoBroken = failedVideos.has(index) || !reel.videoUrl
                 return (
-                  <article
-                    key={reel.id}
-                    className={`card-surface overflow-hidden transition ${
-                      isActive ? 'ring-2 ring-pine/35' : 'opacity-95'
-                    }`}
-                  >
+                  <article key={reel.id} className="card-surface overflow-hidden">
                     <div className="relative aspect-[9/14] overflow-hidden bg-[linear-gradient(160deg,#d7e0d4_0%,#b7c7b2_55%,#8fa88a_100%)]">
                       {!videoBroken ? (
                         <video
@@ -277,11 +272,17 @@ export default function InstagramReels({
                           src={reel.videoUrl}
                           poster={reel.thumbnailUrl || undefined}
                           muted
+                          autoPlay
+                          loop
                           playsInline
-                          preload={isActive ? 'auto' : 'metadata'}
-                          onEnded={advance}
-                          onClick={() => setActiveIndex(index)}
+                          preload="auto"
                           onError={() => markVideoFailed(index)}
+                          onLoadedData={(event) => {
+                            const video = event.currentTarget
+                            video.muted = true
+                            if (!sectionVisible) return
+                            video.play().catch(() => {})
+                          }}
                           aria-label={reel.caption?.slice(0, 80) || `Instagram reel by @${handle}`}
                         />
                       ) : (
@@ -290,14 +291,12 @@ export default function InstagramReels({
                           target="_blank"
                           rel="noreferrer"
                           className="block h-full w-full"
-                          onClick={() => setActiveIndex(index)}
                         >
                           <SafeImage
                             src={reel.thumbnailUrl}
                             alt={reel.caption?.slice(0, 80) || `Instagram still by @${handle}`}
                             className="h-full w-full object-cover"
                             loading="lazy"
-                            onLoad={undefined}
                             onError={() => markThumbFailed(index)}
                           />
                           <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-pine-deep/70 to-transparent px-4 py-5 text-sm font-semibold text-white">
@@ -340,11 +339,8 @@ export default function InstagramReels({
                 See all reels on Instagram
               </a>
               <p className="text-sm text-muted">
-                Official Instagram: @{handle}.
+                Official Instagram: @{handle}. Reels autoplay muted when this section is on screen.
                 {feed?.cached ? ' Showing the latest saved feed.' : ''}
-                {preferStills || failedVideos.size
-                  ? ' Open Instagram to watch the full reels.'
-                  : ''}
               </p>
             </div>
           </>
