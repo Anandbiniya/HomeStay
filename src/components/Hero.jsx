@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
-import heroImage from '../assets/images/hero.jpg'
 import { siteConfig } from '../config/site'
+import { images } from '../data/imageMap'
 import { useLead } from '../context/LeadContext'
 import SafeImage from './SafeImage'
 
@@ -11,8 +11,8 @@ export default function Hero() {
     <section id="home" className="relative min-h-[100svh] overflow-hidden">
       <div className="hero-media absolute inset-0">
         <SafeImage
-          src={heroImage}
-          alt="Camping under the open sky at Hostillam"
+          src={images.homeHero}
+          alt="Hills and greenery around Hostillam in Kodaikanal"
           className="h-full w-full object-cover"
           loading="eager"
           fetchPriority="high"

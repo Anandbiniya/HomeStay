@@ -1,5 +1,5 @@
-import locationImage from '../assets/images/location.jpg'
 import { siteConfig } from '../config/site'
+import { images } from '../data/imageMap'
 import { useReveal } from '../hooks/useReveal'
 import { useLead } from '../context/LeadContext'
 import { Events } from '../services/trackingService'
@@ -47,7 +47,7 @@ export default function Location() {
           <div className="space-y-4">
             <div className="overflow-hidden rounded-[1.4rem]">
               <SafeImage
-                src={locationImage}
+                src={images.location}
                 alt="Scenic hills near Hostillam in Kodaikanal"
                 className="aspect-[16/10] w-full object-cover"
               />

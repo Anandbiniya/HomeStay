@@ -7,8 +7,10 @@ import { usePageMeta } from '../hooks/usePageMeta'
 import { volunteerContent } from '../data/volunteer'
 import { siteConfig } from '../config/site'
 import { openWhatsAppVolunteer } from '../utils/whatsapp'
-import heroImage from '../assets/images/exp-outdoor.jpg'
+import { images } from '../data/imageMap'
 import SafeImage from '../components/SafeImage'
+
+const volunteerHero = images.volunteer
 
 const initialForm = {
   name: '',
@@ -103,8 +105,8 @@ export default function VolunteerPage() {
       <section className="relative min-h-[72svh] overflow-hidden md:min-h-[78svh]">
         <div className="hero-media absolute inset-0">
           <SafeImage
-            src={heroImage}
-            alt="Outdoor nature stay around Hostillam in Kodaikanal"
+            src={volunteerHero}
+            alt="Trail walk near Hostillam in Kodaikanal"
             className="h-full w-full object-cover"
             loading="eager"
             fetchPriority="high"
