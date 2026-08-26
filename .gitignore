@@ -1,0 +1,34 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+.env
+backend/data/store.json
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Runtime caches
+backend/data/*.json
+# Note: a few seed reel mp4s may live in backend/data/instagram-videos/ for reliable autoplay.
+# Newly warmed videos can be added locally; prefer regenerating via the API warmer.
+
+# Full-resolution Drive conversion dump (classified copies are kept under uploads/*)
+src/assets/images/uploads/_raw/
